@@ -1,0 +1,65 @@
+generator client {
+  provider = "prisma-client-js"
+  output   = "../app/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model User {
+  id         String  @id @default(cuid())
+  email      String  @unique
+  username   String  @unique
+  password   String
+  profileUrl String?
+
+  designs Design[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Design {
+  id String @id @default(cuid())
+
+  title   String  @db.VarChar(20)
+  caption String? @db.VarChar(280)
+
+  imageUrl    String
+  igMediaId   String?
+  igPermalink String?
+
+  gender Gender
+  size   TattooSize
+
+  bodyPart String
+
+  styles          String[] // e.g. ["Minimalist", "Fine-Line"]
+  themes          String[] // e.g. ["Shiva Tattoos", "Trishul"]
+  specializations String[] // e.g. ["Cover-Up", "Scar Camouflage"]
+
+  userId String
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([gender])
+  @@index([size])
+  @@index([bodyPart])
+}
+
+enum Gender {
+  MALE
+  FEMALE
+  UNISEX
+}
+
+enum TattooSize {
+  SMALL
+  MEDIUM
+  LARGE
+  EXTRA_LARGE
+  FULL_COVERAGE
+}
