@@ -76,7 +76,7 @@ export async function uploadAndSaveSelectedImages(
 
     return { 
       success: true, 
-      redirectUrl: `/onboarding/designs?userId=${userId}&designIds=${designIds}` 
+      redirectUrl: `/designs?userId=${userId}&designIds=${designIds}` 
     };
 
   } catch (error) {
