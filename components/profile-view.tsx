@@ -19,7 +19,7 @@ type Design = {
   id: string;
   imageUrl: string;
   title: string;
-  caption: string;
+  caption: string | null;
   gender: string;
   bodyPart: string;
   styles: string[];
@@ -311,7 +311,7 @@ export function ProfileView({ user }: { user: UserProfile }) {
                 </label>
                 <textarea
                   name="caption"
-                  defaultValue={editingDesign.caption}
+                  defaultValue={editingDesign.caption || ""}
                   rows={3}
                   className="w-full bg-neutral-950 border border-neutral-800 rounded-lg px-3 py-2 text-white focus:border-rose-500 outline-none mt-1 resize-none"
                 />
