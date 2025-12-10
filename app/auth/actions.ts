@@ -7,6 +7,7 @@ interface UserFormData {
   email: string;
   username?: string;
   profileUrl: string;
+  instagramUrl: string;
   password: string;
 }
 
@@ -23,6 +24,7 @@ interface AuthResponse {
   success: boolean;
   message: string;
   userId?: string;
+  profileUrl?: string;
   error?: string;
 }
 
@@ -109,6 +111,7 @@ export async function loginUser(data: { email: string; password: string }): Prom
       select: {
         id: true,
         password: true,
+        profileUrl: true,
       },
     });
 
@@ -122,12 +125,12 @@ export async function loginUser(data: { email: string; password: string }): Prom
       return { success: false, message: "Invalid credentials", error: 'INVALID_PASSWORD' };
     }
 
-    // TODO: Create Session Here (Cookie/JWT)
     
     return { 
       success: true, 
       message: "Logged in successfully",
-      userId: user.id 
+      userId: user.id ,
+      profileUrl: user.profileUrl || undefined
     };
   } catch (error) {
     console.error("Login error:", error);

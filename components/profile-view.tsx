@@ -34,7 +34,7 @@ type UserProfile = {
 };
 
 export function ProfileView({ user }: { user: UserProfile }) {
-  const [designs, setDesigns] = useState<Design[]>(user.designs);
+  const [designs, setDesigns] = useState<Design[]>(user?.designs);
   const [activeFilter, setActiveFilter] = useState<string | null>(null);
 
   const [editingDesign, setEditingDesign] = useState<Design | null>(null);

@@ -1,11 +1,31 @@
 "use client";
 
 import Link from "next/link";
-import { usePathname } from "next/navigation";
-import { Sparkles, Plus, Home, Image as ImageIcon } from "lucide-react";
+import { usePathname, useSearchParams } from "next/navigation";
+import { Sparkles, Plus, Home } from "lucide-react";
 
-export function ProfileNavbar() {
+// 1. Define the interface for the props
+interface ProfileNavbarProps {
+  userId?: string;
+  instagramUrl?: string;
+}
+
+// 2. Accept the props in the function
+export function ProfileNavbar({
+  userId: propUserId,
+  instagramUrl: propInstagramUrl,
+}: ProfileNavbarProps) {
   const pathname = usePathname();
+  const searchParams = useSearchParams();
+
+  // 3. Logic: Use the Prop first. If not provided, try the URL. If neither, default to empty string.
+  const userId = propUserId || searchParams.get("userId") || "";
+  const instagramUrl =
+    propInstagramUrl || searchParams.get("instagramUrl") || "";
+
+  const profileGeneratorUrl = `/profile/profile-generator?userId=${userId}&instagramUrl=${encodeURIComponent(
+    instagramUrl
+  )}`;
 
   return (
     <nav className="sticky top-0 z-50 w-full bg-neutral-950/80 backdrop-blur-md border-b border-white/5">
@@ -25,8 +45,7 @@ export function ProfileNavbar() {
 
         {/* --- RIGHT: Actions --- */}
         <div className="flex items-center gap-3 md:gap-4">
-          {/* Optional: Link back to Profile View if we are on the Generate page */}
-          {pathname === "/profile/generate" && (
+          {pathname === "/profile/profile-generator" && (
             <Link
               href="/profile"
               className="text-sm font-medium text-neutral-400 hover:text-white transition-colors flex items-center gap-2"
@@ -36,10 +55,9 @@ export function ProfileNavbar() {
             </Link>
           )}
 
-          {/* Add Image Button (Hidden if we are already on generate page) */}
           {pathname !== "/profile/profile-generator" && (
             <Link
-              href="/profile/profile-generator"
+              href={profileGeneratorUrl}
               className="group flex items-center gap-2 bg-rose-600 hover:bg-rose-700 text-white px-4 py-2 rounded-full text-sm font-medium transition-all shadow-[0_0_15px_rgba(225,29,72,0.3)] hover:shadow-[0_0_25px_rgba(225,29,72,0.5)]"
             >
               <Plus className="w-4 h-4 transition-transform group-hover:rotate-90" />
@@ -47,7 +65,6 @@ export function ProfileNavbar() {
             </Link>
           )}
 
-          {/* Mobile Profile Icon (Visual anchor) */}
           <div className="w-8 h-8 rounded-full bg-neutral-800 border border-neutral-700 flex items-center justify-center ml-2">
             <span className="text-xs font-bold text-white">U</span>
           </div>
