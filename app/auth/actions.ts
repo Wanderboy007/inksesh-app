@@ -7,7 +7,6 @@ interface UserFormData {
   email: string;
   username?: string;
   profileUrl: string;
-  instagramUrl: string;
   password: string;
 }
 
@@ -24,7 +23,6 @@ interface AuthResponse {
   success: boolean;
   message: string;
   userId?: string;
-  profileUrl?: string;
   error?: string;
 }
 

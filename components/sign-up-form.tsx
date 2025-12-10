@@ -70,6 +70,14 @@ export default function SignUpForm() {
         shouldValidate: true,
         shouldDirty: true,
       });
+      
+      setValue("instagramUrl", profileUrlValue, {
+        shouldValidate: true,
+        shouldDirty: true,
+      });
+    }
+  }, [profileUrlValue, setValue]);
+      });
     }
   }, [profileUrlValue, setValue]);
 
