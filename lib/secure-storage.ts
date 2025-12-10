@@ -1,7 +1,7 @@
 // lib/secure-storage.ts
 import CryptoJS from "crypto-js";
 
-const SECRET_KEY = process.env.NEXT_PUBLIC_ENCRYPTION_KEY || "default-fallback-key";
+const SECRET_KEY = process.env.ENCRYPTION_KEY || "default-fallback-key";
 
 export const secureStorage = {
   /**
