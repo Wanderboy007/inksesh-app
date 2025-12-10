@@ -23,6 +23,7 @@ type Design = {
   title: string;
   caption: string | null;
   gender: string;
+  size: string;
   bodyPart: string;
   styles: string[];
   themes: string[];
@@ -78,6 +79,9 @@ export function ProfileView({ user }: { user: UserProfile }) {
             ...d,
             title: formData.get("title") as string,
             caption: formData.get("caption") as string,
+            gender: formData.get("gender") as string,
+            size: formData.get("size") as string,
+            bodyPart: formData.get("bodyPart") as string,
             styles: (formData.get("styles") as string)
               .split(",")
               .map((s) => s.trim())
@@ -269,7 +273,7 @@ export function ProfileView({ user }: { user: UserProfile }) {
                     height={700}
                     className="w-full h-auto object-cover"
                   />
-                  <div className="absolute inset-0 bg-black/20 md:bg-black/60 md:opacity-0 md:group-hover:opacity-100 transition-opacity duration-200 flex flex-col justify-end p-3 md:p-4">
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/40 to-transparent md:bg-black/60 md:opacity-0 md:group-hover:opacity-100 transition-opacity duration-200 flex flex-col justify-end p-3 md:p-4">
                     <button
                       onClick={(e) => {
                         e.stopPropagation();
@@ -284,17 +288,35 @@ export function ProfileView({ user }: { user: UserProfile }) {
                       {design.title || "Untitled"}
                     </h3>
 
-                    <div className="hidden md:flex flex-wrap gap-1.5 mt-3">
-                      {[...design.styles, ...design.themes]
-                        .slice(0, 3)
-                        .map((t) => (
-                          <span
-                            key={t}
-                            className="text-[10px] uppercase font-bold tracking-wide bg-white/10 px-2 py-1 rounded text-white border border-white/10"
-                          >
-                            {t}
+                    <div className="flex flex-col gap-1.5 md:gap-2 mt-1.5 md:mt-3">
+                      <div className="flex flex-wrap gap-1 md:gap-1.5">
+                        {[...design.styles, ...design.themes]
+                          .slice(0, 2)
+                          .map((t) => (
+                            <span
+                              key={t}
+                              className="text-[8px] md:text-[10px] uppercase font-bold tracking-wide bg-white/10 px-1.5 md:px-2 py-0.5 md:py-1 rounded text-white border border-white/10"
+                            >
+                              {t}
+                            </span>
+                          ))}
+                        {[...design.styles, ...design.themes].length > 2 && (
+                          <span className="text-[8px] md:text-[10px] uppercase font-bold tracking-wide bg-white/10 px-1.5 md:px-2 py-0.5 md:py-1 rounded text-white/60 border border-white/10">
+                            +{[...design.styles, ...design.themes].length - 2}
                           </span>
-                        ))}
+                        )}
+                      </div>
+                      <div className="flex flex-wrap gap-1 md:gap-1.5 text-[8px] md:text-[10px] uppercase font-semibold">
+                        <span className="bg-rose-600/20 text-rose-300 px-1.5 md:px-2 py-0.5 md:py-1 rounded border border-rose-500/20">
+                          {design.gender}
+                        </span>
+                        <span className="bg-blue-600/20 text-blue-300 px-1.5 md:px-2 py-0.5 md:py-1 rounded border border-blue-500/20">
+                          {design.size.replace("_", " ")}
+                        </span>
+                        <span className="bg-purple-600/20 text-purple-300 px-1.5 md:px-2 py-0.5 md:py-1 rounded border border-purple-500/20 truncate max-w-[80px] md:max-w-none">
+                          {design.bodyPart || "N/A"}
+                        </span>
+                      </div>
                     </div>
                   </div>
                 </div>
@@ -376,6 +398,52 @@ export function ProfileView({ user }: { user: UserProfile }) {
                   placeholder="Nature, Skull, Floral"
                   className="w-full bg-neutral-950 border border-neutral-800 rounded-lg px-4 py-3 text-white focus:border-rose-500 focus:ring-1 focus:ring-rose-500 outline-none transition-all placeholder:text-neutral-600"
                 />
+              </div>
+
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                <div>
+                  <label className="text-xs font-semibold text-neutral-400 uppercase tracking-wider mb-1.5 block">
+                    Gender
+                  </label>
+                  <select
+                    name="gender"
+                    defaultValue={editingDesign.gender}
+                    className="w-full bg-neutral-950 border border-neutral-800 rounded-lg px-4 py-3 text-white focus:border-rose-500 focus:ring-1 focus:ring-rose-500 outline-none transition-all appearance-none cursor-pointer"
+                  >
+                    <option value="MALE">Male</option>
+                    <option value="FEMALE">Female</option>
+                    <option value="UNISEX">Unisex</option>
+                  </select>
+                </div>
+
+                <div>
+                  <label className="text-xs font-semibold text-neutral-400 uppercase tracking-wider mb-1.5 block">
+                    Size
+                  </label>
+                  <select
+                    name="size"
+                    defaultValue={editingDesign.size}
+                    className="w-full bg-neutral-950 border border-neutral-800 rounded-lg px-4 py-3 text-white focus:border-rose-500 focus:ring-1 focus:ring-rose-500 outline-none transition-all appearance-none cursor-pointer"
+                  >
+                    <option value="SMALL">Small</option>
+                    <option value="MEDIUM">Medium</option>
+                    <option value="LARGE">Large</option>
+                    <option value="EXTRA_LARGE">Extra Large</option>
+                    <option value="FULL_COVERAGE">Full Coverage</option>
+                  </select>
+                </div>
+
+                <div>
+                  <label className="text-xs font-semibold text-neutral-400 uppercase tracking-wider mb-1.5 block">
+                    Body Part
+                  </label>
+                  <input
+                    name="bodyPart"
+                    defaultValue={editingDesign.bodyPart}
+                    placeholder="e.g. Forearm, Back"
+                    className="w-full bg-neutral-950 border border-neutral-800 rounded-lg px-4 py-3 text-white focus:border-rose-500 focus:ring-1 focus:ring-rose-500 outline-none transition-all placeholder:text-neutral-600"
+                  />
+                </div>
               </div>
 
               {/* MODAL FOOTER */}

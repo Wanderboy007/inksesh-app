@@ -18,6 +18,10 @@ const nextConfig = {
         protocol: 'https',
         hostname: 'utfs.io',        // For your mock data
       },
+      {
+        protocol: 'https',
+        hostname: 'www.instagram.com',        // For your mock data
+      },
     ],
   },
 };

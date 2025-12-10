@@ -6,8 +6,10 @@ import { revalidatePath } from "next/cache";
 
 export async function updateDesign(designId: string, formData: FormData) {
   const title = formData.get("title") as string;
-  // 👇 Extract caption from the form data
   const caption = formData.get("caption") as string;
+  const gender = formData.get("gender") as "MALE" | "FEMALE" | "UNISEX";
+  const size = formData.get("size") as "SMALL" | "MEDIUM" | "LARGE" | "EXTRA_LARGE" | "FULL_COVERAGE";
+  const bodyPart = formData.get("bodyPart") as string;
   
   const styles = (formData.get("styles") as string)
     .split(",")
@@ -23,7 +25,10 @@ export async function updateDesign(designId: string, formData: FormData) {
     where: { id: designId },
     data: {
       title,
-      caption, // 👇 Update caption in DB
+      caption,
+      gender,
+      size,
+      bodyPart,
       styles,
       themes,
     },
