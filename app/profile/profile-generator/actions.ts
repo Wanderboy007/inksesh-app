@@ -80,11 +80,12 @@ export async function uploadAndSaveSelectedImages(
 
     return { 
       success: true, 
-      redirectUrl: `/onboarding/designs?userId=${userId}&designIds=${designIds}` 
-    };
+      redirectUrl: "/profile"};
 
   } catch (error) {
     console.error("❌ Upload failed:", error);
     return { success: false, error: "Failed to upload images" };
   }
-}
+} 
+
+

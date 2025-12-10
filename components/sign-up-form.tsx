@@ -84,7 +84,11 @@ export default function SignUpForm() {
 
         // Redirect to /profile after success
         setTimeout(() => {
-          router.push(`/profile/profile-generator?userId=${result.user.id}`);
+          router.push(
+            `/profile/profile-generator?userId=${
+              result.user.id
+            }&instagramUrl=${encodeURIComponent(data.profileUrl)}`
+          );
         }, 500);
       } else {
         toast.error(result.message);

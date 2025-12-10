@@ -34,9 +34,7 @@ export default function Step2SelectContent() {
         const res = await fetch("/api/instagram/fetch-media", {
           method: "POST",
           body: JSON.stringify({
-            inputUrl:
-              instagramUrl ||
-              "https://www.instagram.com/tattoo_temple_trivandrum/",
+            inputUrl: instagramUrl,
           }),
         });
 
