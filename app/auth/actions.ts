@@ -128,7 +128,6 @@ export async function loginUser(data: { email: string; password: string }): Prom
       success: true, 
       message: "Logged in successfully",
       userId: user.id ,
-      profileUrl: user.profileUrl || undefined
     };
   } catch (error) {
     console.error("Login error:", error);

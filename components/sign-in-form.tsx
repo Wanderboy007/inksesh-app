@@ -35,11 +35,7 @@ export default function SignInForm() {
 
       if (result.success) {
         toast.success("Welcome back!");
-        router.push(
-          `/profile?userId=${result.userId}&instagramUrl=${encodeURIComponent(
-            result.profileUrl || ""
-          )}`
-        );
+        router.push(`/profile`);
       } else {
         toast.error(result.message || "Invalid credentials");
       }
