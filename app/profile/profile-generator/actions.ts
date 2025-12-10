@@ -78,9 +78,36 @@ export async function uploadAndSaveSelectedImages(
 
     const designIds = createdDesigns.map((d) => d.id).join(",");
 
+    console.log("🤖 Starting AI Analysis for:", designIds);
+
+    // 4. Call AI Endpoint Directly
+    try {
+      const aiResponse = await fetch(
+        `${process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000"}/api/ai/generatematadata`,
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ userId, designIds }),
+        }
+      );
+
+      if (!aiResponse.ok) {
+        const errorData = await aiResponse.json();
+        console.error("❌ AI Error:", errorData);
+        throw new Error(errorData.error || "AI Analysis Failed");
+      }
+
+      const aiData = await aiResponse.json();
+      console.log("✅ AI Success:", aiData);
+    } catch (aiError) {
+      console.error("⚠️ AI Analysis warning (designs still saved):", aiError);
+      // Continue even if AI fails - designs are already saved
+    }
+
     return { 
       success: true, 
-      redirectUrl: "/profile"};
+      redirectUrl: `/profile?userId=${userId}`
+    };
 
   } catch (error) {
     console.error("❌ Upload failed:", error);

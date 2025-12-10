@@ -96,41 +96,13 @@ export default function Step2SelectContent() {
         throw new Error(result.error || "Upload failed");
       }
 
-      // --- PHASE 2: AI ANALYSIS ---
+      // --- PHASE 2: SUCCESS ---
       setIsUploading(false);
       setIsAnalyzing(true);
 
-      // Extract designIds from redirect URL
-      if (!result.redirectUrl) {
-        throw new Error("No redirect URL returned from upload");
-      }
+      // Small delay to show success message
+      await new Promise(resolve => setTimeout(resolve, 1500));
 
-      const urlObj = new URL(result.redirectUrl, "http://dummy.com");
-      const designIds = urlObj.searchParams.get("designIds");
-
-      if (!designIds) {
-        throw new Error("No design IDs returned from upload");
-      }
-
-      console.log("🤖 Starting AI Analysis for:", designIds);
-
-      // 2. Call AI Endpoint
-      const aiResponse = await fetch("/api/ai/generatematadata", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ userId, designIds }),
-      });
-
-      if (!aiResponse.ok) {
-        const errorData = await aiResponse.json();
-        console.error("❌ AI Error:", errorData);
-        throw new Error(errorData.error || "AI Analysis Failed");
-      }
-
-      const aiData = await aiResponse.json();
-      console.log("✅ AI Success:", aiData);
-
-      // --- PHASE 3: FINISH ---
       setIsAnalyzing(false);
       if (result.redirectUrl) {
         router.push(result.redirectUrl);

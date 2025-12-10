@@ -8,6 +8,7 @@ import * as z from "zod";
 import { Sparkles, Loader2 } from "lucide-react";
 import { toast } from "sonner";
 import { createUserProfile } from "@/app/auth/actions";
+import { secureStorage } from "@/lib/secure-storage";
 
 const formSchema = z.object({
   email: z.string().email("Please enter a valid email address"),
@@ -78,8 +79,8 @@ export default function SignUpForm() {
       const result = await createUserProfile(data);
 
       if (result.success && result.user) {
+        secureStorage.setItem("c_uid", result.user.id);
         toast.success(result.message);
-        console.log("User created successfully:", result.user);
         reset();
 
         // Redirect to /profile after success

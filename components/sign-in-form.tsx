@@ -8,6 +8,7 @@ import * as z from "zod";
 import { LogIn, Loader2 } from "lucide-react";
 import { toast } from "sonner";
 import { loginUser } from "@/app/auth/actions";
+import { secureStorage } from "@/lib/secure-storage";
 
 // simpler schema for login
 const signInSchema = z.object({
@@ -33,7 +34,9 @@ export default function SignInForm() {
     try {
       const result = await loginUser(data);
 
-      if (result.success) {
+      if (result.success && result.userId) {
+        secureStorage.setItem("c_uid", result.userId);
+
         toast.success("Welcome back!");
         router.push(`/profile`);
       } else {

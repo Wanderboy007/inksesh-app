@@ -3,9 +3,37 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { Sparkles, Plus, Home, Image as ImageIcon } from "lucide-react";
+import { secureStorage } from "@/lib/secure-storage";
+import { getUserById } from "@/lib/get-user-info";
+import { useEffect, useState } from "react";
 
 export function ProfileNavbar() {
   const pathname = usePathname();
+  const [id, setId] = useState<string>("");
+  const [profileUrl, setProfileUrl] = useState<string>("");
+
+  useEffect(() => {
+    // 2. Define an async function to handle the fetching
+    const fetchData = async () => {
+      // Get the encrypted ID from local storage
+      const storedId = secureStorage.getItem("c_uid");
+
+      if (storedId) {
+        // Save the ID to state
+        setId(storedId);
+
+        // Call your server action
+        const result = await getUserById(storedId);
+
+        // If successful, save the profile URL to state
+        if (result.success && result.user) {
+          setProfileUrl(result.user.profileUrl || "");
+        }
+      }
+    };
+
+    fetchData();
+  }, []);
 
   return (
     <nav className="sticky top-0 z-50 w-full bg-neutral-950/80 backdrop-blur-md border-b border-white/5">
@@ -39,7 +67,9 @@ export function ProfileNavbar() {
           {/* Add Image Button (Hidden if we are already on generate page) */}
           {pathname !== "/profile/profile-generator" && (
             <Link
-              href="/profile/profile-generator"
+              href={`/profile/profile-generator?userId=${id}&instagramUrl=${encodeURIComponent(
+                profileUrl
+              )}`}
               className="group flex items-center gap-2 bg-rose-600 hover:bg-rose-700 text-white px-4 py-2 rounded-full text-sm font-medium transition-all shadow-[0_0_15px_rgba(225,29,72,0.3)] hover:shadow-[0_0_25px_rgba(225,29,72,0.5)]"
             >
               <Plus className="w-4 h-4 transition-transform group-hover:rotate-90" />

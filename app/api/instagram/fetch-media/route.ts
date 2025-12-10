@@ -34,8 +34,6 @@ export async function POST(req: NextRequest) {
     // Fetch results from dataset
     const { items } = await client.dataset(run.defaultDatasetId).listItems();
 
-    console.log("📊 Raw items from Apify:", JSON.stringify(items, null, 2)); // Debug all items
-    console.log("📊 Total items received:", items?.length);
 
     if (!items || items.length === 0) {
       return NextResponse.json({ error: "No posts found or profile is private." }, { status: 404 });
@@ -44,7 +42,7 @@ export async function POST(req: NextRequest) {
     // Remove type filtering - check what the actual data structure is
     const normalizedPosts = items
       .map((item: any) => {
-        // console.log("Processing item:", item.id, "Type:", item.type); // Debug each item
+       
         return {
           id: item.id,
           url: item.displayUrl || item.images?.[0] || item.url,
@@ -54,9 +52,7 @@ export async function POST(req: NextRequest) {
       })
       .filter((post: any) => post.url); // Only keep posts with URLs
     
-    // console.log(`✅ Normalized posts: ${normalizedPosts.length}`);
-    // console.log(`Posts data:`, JSON.stringify(normalizedPosts, null, 2));
-    
+  
     return NextResponse.json({ posts: normalizedPosts }, { status: 200 });
 
   } catch (error) {

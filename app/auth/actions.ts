@@ -81,8 +81,6 @@ export async function createUserProfile(data: UserFormData): Promise<CreateUserR
       },
     });
 
-    console.log('User created successfully:', newUser);
-
     return {
       success: true,
       message: 'Profile created successfully',

@@ -16,6 +16,7 @@
     "@uploadthing/react": "^7.3.3",
     "apify-client": "^2.20.0",
     "bcryptjs": "^3.0.3",
+    "crypto-js": "^4.2.0",
     "jsonwebtoken": "^9.0.3",
     "lucide-react": "^0.556.0",
     "next": "16.0.8",
@@ -29,6 +30,7 @@
   },
   "devDependencies": {
     "@tailwindcss/postcss": "^4",
+    "@types/crypto-js": "^4.2.2",
     "@types/node": "^20",
     "@types/react": "^19",
     "@types/react-dom": "^19",
