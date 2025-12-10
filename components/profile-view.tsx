@@ -11,8 +11,10 @@ import {
   Pencil,
   Save,
   Loader2,
+  Trash2,
 } from "lucide-react";
 import { updateDesign } from "@/app/profile/actions";
+import { deleteDesign } from "@/app/profile/_edit-actions/delete-design-profile";
 
 // --- TYPES ---
 type Design = {
@@ -39,6 +41,7 @@ export function ProfileView({ user }: { user: UserProfile }) {
 
   const [editingDesign, setEditingDesign] = useState<Design | null>(null);
   const [isSaving, setIsSaving] = useState(false);
+  const [isDeleting, setIsDeleting] = useState(false);
 
   // --- DYNAMIC HEADER IMAGE ---
   const headerImage = designs.length > 0 ? designs[0].imageUrl : null;
@@ -95,11 +98,34 @@ export function ProfileView({ user }: { user: UserProfile }) {
     setEditingDesign(null);
   };
 
+  // --- DELETE HANDLER ---
+  const handleDelete = async () => {
+    if (!editingDesign) return;
+
+    const confirmed = window.confirm(
+      "Are you sure you want to delete this design? This action cannot be undone."
+    );
+
+    if (!confirmed) return;
+
+    setIsDeleting(true);
+
+    try {
+      const remainingDesigns = designs.filter((d) => d.id !== editingDesign.id);
+      setDesigns(remainingDesigns);
+      setEditingDesign(null);
+      await deleteDesign(editingDesign.id);
+    } catch (error) {
+      console.error("Error deleting design:", error);
+    } finally {
+      setIsDeleting(false);
+    }
+  };
+
   return (
     <div className="min-h-screen bg-neutral-950 text-white pb-20 relative">
       {/* --- HERO HEADER --- */}
       <header className="relative w-full h-56 md:h-80 border-b border-white/5 overflow-hidden transition-all duration-500">
-        {/* 1. Dynamic Background Layer */}
         {headerImage ? (
           <>
             <Image
@@ -118,7 +144,6 @@ export function ProfileView({ user }: { user: UserProfile }) {
 
         <div className="absolute inset-0 bg-[url('https://grainy-gradients.vercel.app/noise.svg')] opacity-20 pointer-events-none mix-blend-overlay"></div>
 
-        {/* 4. Header Content */}
         <div className="max-w-7xl mx-auto px-4 md:px-6 h-full flex flex-col justify-end pb-6 md:pb-8 relative z-10">
           <div className="flex items-end gap-4 md:gap-8">
             <div className="w-20 h-20 md:w-32 md:h-32 rounded-full bg-neutral-800 border-4 border-neutral-950 overflow-hidden shadow-2xl relative flex-shrink-0">
@@ -165,15 +190,22 @@ export function ProfileView({ user }: { user: UserProfile }) {
       </header>
 
       {/* --- FILTER BAR --- */}
-      <div className="sticky top-0 z-30 bg-neutral-950/80 backdrop-blur-md border-b border-white/5 py-3 md:py-4 px-4 md:px-6 transition-all">
+      <div className="sticky top-0 z-30 bg-neutral-950/90 backdrop-blur-xl border-b border-white/5 py-2 md:py-4 px-4 md:px-6 transition-all">
         <div className="max-w-7xl mx-auto flex items-center justify-between gap-4">
-          <div className="flex gap-2 overflow-x-auto pb-1 no-scrollbar mask-gradient-right">
+          <div
+            className="flex gap-2 overflow-x-auto pb-2 w-full
+            [&::-webkit-scrollbar]:h-1.5
+            [&::-webkit-scrollbar-track]:bg-transparent
+            [&::-webkit-scrollbar-thumb]:bg-neutral-800
+            [&::-webkit-scrollbar-thumb]:rounded-full
+            [&::-webkit-scrollbar-thumb]:hover:bg-neutral-700"
+          >
             <button
               onClick={() => setActiveFilter(null)}
-              className={`px-3 md:px-4 py-1.5 rounded-full text-xs md:text-sm font-medium whitespace-nowrap transition-all ${
+              className={`px-4 py-2 rounded-full text-xs md:text-sm font-medium whitespace-nowrap transition-all border flex-shrink-0 ${
                 activeFilter === null
-                  ? "bg-white text-black"
-                  : "bg-neutral-900 border border-neutral-800 text-neutral-400 hover:text-white"
+                  ? "bg-white text-neutral-950 border-white"
+                  : "bg-neutral-900 border-neutral-800 text-neutral-400 hover:text-white hover:border-neutral-700"
               }`}
             >
               All Work
@@ -182,20 +214,21 @@ export function ProfileView({ user }: { user: UserProfile }) {
               <button
                 key={tag}
                 onClick={() => setActiveFilter(tag)}
-                className={`px-3 md:px-4 py-1.5 rounded-full text-xs md:text-sm font-medium whitespace-nowrap transition-all ${
+                className={`px-4 py-2 rounded-full text-xs md:text-sm font-medium whitespace-nowrap transition-all border flex-shrink-0 ${
                   activeFilter === tag
-                    ? "bg-rose-600 text-white"
-                    : "bg-neutral-900 border border-neutral-800 text-neutral-400 hover:text-white"
+                    ? "bg-rose-600 border-rose-600 text-white"
+                    : "bg-neutral-900 border-neutral-800 text-neutral-400 hover:text-white hover:border-neutral-700"
                 }`}
               >
                 {tag}
               </button>
             ))}
           </div>
+
           {activeFilter && (
             <button
               onClick={() => setActiveFilter(null)}
-              className="p-1.5 md:p-2 bg-neutral-800 rounded-full hover:bg-neutral-700 text-white flex-shrink-0"
+              className="p-2 bg-neutral-800 rounded-full hover:bg-neutral-700 text-white flex-shrink-0 transition-colors mb-2" // mb-2 aligns it with buttons since scrollbar adds height
             >
               <X className="w-4 h-4" />
             </button>
@@ -204,8 +237,8 @@ export function ProfileView({ user }: { user: UserProfile }) {
       </div>
 
       {/* --- GRID --- */}
-      <div className="max-w-7xl mx-auto px-2 md:px-6 mt-4 md:mt-8">
-        <div className="mb-4 md:mb-6 px-2 text-xs md:text-sm text-neutral-500">
+      <div className="max-w-7xl mx-auto px-2 md:px-6 mt-6 md:mt-8">
+        <div className="mb-4 md:mb-6 px-2 text-xs md:text-sm text-neutral-500 font-medium">
           Showing {filteredDesigns.length}{" "}
           {activeFilter ? `"${activeFilter}"` : ""} designs
         </div>
@@ -222,16 +255,11 @@ export function ProfileView({ user }: { user: UserProfile }) {
             </button>
           </div>
         ) : (
-          /* UPDATED GRID:
-             - columns-2 on mobile (gap-2)
-             - columns-3 on tablet
-             - columns-4 on desktop (gap-4)
-          */
           <div className="columns-2 md:columns-3 lg:columns-4 gap-2 md:gap-4 space-y-2 md:space-y-4">
             {filteredDesigns.map((design) => (
               <div
                 key={design.id}
-                className="break-inside-avoid bg-neutral-900 rounded-lg md:rounded-xl overflow-hidden border border-neutral-800 hover:border-rose-500/50 transition-all group relative mb-2 md:mb-4"
+                className="break-inside-avoid bg-neutral-900 rounded-lg md:rounded-xl overflow-hidden border border-neutral-800 hover:border-rose-500/50 transition-all group relative mb-2 md:mb-4 shadow-lg shadow-black/20"
               >
                 <div className="relative w-full">
                   <Image
@@ -241,16 +269,13 @@ export function ProfileView({ user }: { user: UserProfile }) {
                     height={700}
                     className="w-full h-auto object-cover"
                   />
-
-                  {/* Overlay: Subtle on mobile, full on desktop hover */}
-                  <div className="absolute inset-0 bg-black/20 md:bg-black/60 md:opacity-0 md:group-hover:opacity-100 transition-opacity duration-200 flex flex-col justify-end p-2 md:p-4">
-                    {/* Edit Button: Smaller on mobile */}
+                  <div className="absolute inset-0 bg-black/20 md:bg-black/60 md:opacity-0 md:group-hover:opacity-100 transition-opacity duration-200 flex flex-col justify-end p-3 md:p-4">
                     <button
                       onClick={(e) => {
                         e.stopPropagation();
                         setEditingDesign(design);
                       }}
-                      className="absolute top-2 right-2 p-1.5 md:p-2 bg-black/40 md:bg-white/10 hover:bg-rose-600 text-white rounded-full backdrop-blur-md transition-colors"
+                      className="absolute top-2 right-2 p-2 bg-black/40 md:bg-white/10 hover:bg-rose-600 text-white rounded-full backdrop-blur-md transition-colors"
                     >
                       <Pencil className="w-3 h-3 md:w-4 md:h-4" />
                     </button>
@@ -259,7 +284,6 @@ export function ProfileView({ user }: { user: UserProfile }) {
                       {design.title || "Untitled"}
                     </h3>
 
-                    {/* Tags: Hidden on Mobile to save space, visible on Desktop */}
                     <div className="hidden md:flex flex-wrap gap-1.5 mt-3">
                       {[...design.styles, ...design.themes]
                         .slice(0, 3)
@@ -282,83 +306,115 @@ export function ProfileView({ user }: { user: UserProfile }) {
 
       {/* --- EDIT MODAL --- */}
       {editingDesign && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm p-4 animate-in fade-in">
-          <div className="bg-neutral-900 border border-neutral-800 w-full max-w-md rounded-2xl p-6 shadow-2xl relative max-h-[90vh] overflow-y-auto">
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm p-4 animate-in fade-in duration-200">
+          <div
+            className="bg-neutral-900 border border-neutral-800 w-full max-w-lg rounded-2xl p-6 md:p-8 shadow-2xl relative max-h-[90vh] overflow-y-auto
+            [&::-webkit-scrollbar]:w-1.5
+            [&::-webkit-scrollbar-track]:bg-transparent
+            [&::-webkit-scrollbar-track]:my-4  /* <--- ADDS SPACING AT TOP & BOTTOM */
+            [&::-webkit-scrollbar-thumb]:bg-neutral-800
+            [&::-webkit-scrollbar-thumb]:rounded-full
+            [&::-webkit-scrollbar-thumb]:hover:bg-neutral-700"
+          >
             <button
               onClick={() => setEditingDesign(null)}
-              className="absolute top-4 right-4 text-neutral-500 hover:text-white"
+              className="absolute top-4 right-4 text-neutral-500 hover:text-white p-2 hover:bg-neutral-800 rounded-full transition-colors"
             >
               <X className="w-5 h-5" />
             </button>
 
-            <h2 className="text-xl font-bold mb-6">Edit Tattoo Details</h2>
+            <h2 className="text-2xl font-bold mb-1 text-white">Edit Details</h2>
+            <p className="text-neutral-500 text-sm mb-6">
+              Update information for this design.
+            </p>
 
-            <form onSubmit={handleSave} className="space-y-4">
+            <form onSubmit={handleSave} className="space-y-5">
               <div>
-                <label className="text-xs font-semibold text-neutral-500 uppercase tracking-wider">
+                <label className="text-xs font-semibold text-neutral-400 uppercase tracking-wider mb-1.5 block">
                   Title
                 </label>
                 <input
                   name="title"
                   defaultValue={editingDesign.title}
-                  className="w-full bg-neutral-950 border border-neutral-800 rounded-lg px-3 py-2 text-white focus:border-rose-500 outline-none mt-1"
+                  placeholder="e.g. Traditional Snake"
+                  className="w-full bg-neutral-950 border border-neutral-800 rounded-lg px-4 py-3 text-white focus:border-rose-500 focus:ring-1 focus:ring-rose-500 outline-none transition-all placeholder:text-neutral-600"
                 />
               </div>
 
               <div>
-                <label className="text-xs font-semibold text-neutral-500 uppercase tracking-wider">
+                <label className="text-xs font-semibold text-neutral-400 uppercase tracking-wider mb-1.5 block">
                   Caption
                 </label>
                 <textarea
                   name="caption"
                   defaultValue={editingDesign.caption || ""}
+                  placeholder="Describe the tattoo..."
                   rows={3}
-                  className="w-full bg-neutral-950 border border-neutral-800 rounded-lg px-3 py-2 text-white focus:border-rose-500 outline-none mt-1 resize-none"
+                  className="w-full bg-neutral-950 border border-neutral-800 rounded-lg px-4 py-3 text-white focus:border-rose-500 focus:ring-1 focus:ring-rose-500 outline-none transition-all resize-none placeholder:text-neutral-600"
                 />
               </div>
 
               <div>
-                <label className="text-xs font-semibold text-neutral-500 uppercase tracking-wider">
+                <label className="text-xs font-semibold text-neutral-400 uppercase tracking-wider mb-1.5 block">
                   Styles (Comma separated)
                 </label>
                 <input
                   name="styles"
                   defaultValue={editingDesign.styles.join(", ")}
-                  className="w-full bg-neutral-950 border border-neutral-800 rounded-lg px-3 py-2 text-white focus:border-rose-500 outline-none mt-1"
+                  placeholder="Realism, Blackwork, Fine Line"
+                  className="w-full bg-neutral-950 border border-neutral-800 rounded-lg px-4 py-3 text-white focus:border-rose-500 focus:ring-1 focus:ring-rose-500 outline-none transition-all placeholder:text-neutral-600"
                 />
               </div>
 
               <div>
-                <label className="text-xs font-semibold text-neutral-500 uppercase tracking-wider">
+                <label className="text-xs font-semibold text-neutral-400 uppercase tracking-wider mb-1.5 block">
                   Themes (Comma separated)
                 </label>
                 <input
                   name="themes"
                   defaultValue={editingDesign.themes.join(", ")}
-                  className="w-full bg-neutral-950 border border-neutral-800 rounded-lg px-3 py-2 text-white focus:border-rose-500 outline-none mt-1"
+                  placeholder="Nature, Skull, Floral"
+                  className="w-full bg-neutral-950 border border-neutral-800 rounded-lg px-4 py-3 text-white focus:border-rose-500 focus:ring-1 focus:ring-rose-500 outline-none transition-all placeholder:text-neutral-600"
                 />
               </div>
 
-              <div className="flex justify-end gap-3 mt-6 pt-2 border-t border-neutral-800">
+              {/* MODAL FOOTER */}
+              <div className="flex flex-col-reverse sm:flex-row sm:justify-between items-center gap-4 mt-8 pt-6 border-t border-neutral-800">
                 <button
                   type="button"
-                  onClick={() => setEditingDesign(null)}
-                  className="px-4 py-2 text-neutral-400 hover:text-white text-sm"
+                  onClick={handleDelete}
+                  disabled={isDeleting || isSaving}
+                  className="w-full sm:w-auto px-4 py-2.5 text-rose-500 hover:bg-rose-950/30 hover:text-rose-400 rounded-lg text-sm font-medium flex items-center justify-center gap-2 transition-colors"
                 >
-                  Cancel
-                </button>
-                <button
-                  type="submit"
-                  disabled={isSaving}
-                  className="px-6 py-2 bg-rose-600 hover:bg-rose-700 text-white rounded-lg flex items-center gap-2 font-medium text-sm"
-                >
-                  {isSaving ? (
+                  {isDeleting ? (
                     <Loader2 className="w-4 h-4 animate-spin" />
                   ) : (
-                    <Save className="w-4 h-4" />
+                    <Trash2 className="w-4 h-4" />
                   )}
-                  Save Changes
+                  Delete
                 </button>
+
+                <div className="flex gap-3 w-full sm:w-auto">
+                  <button
+                    type="button"
+                    onClick={() => setEditingDesign(null)}
+                    className="flex-1 sm:flex-none px-5 py-2.5 bg-neutral-800 hover:bg-neutral-700 text-neutral-300 rounded-lg text-sm font-medium transition-colors"
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    type="submit"
+                    disabled={isSaving || isDeleting}
+                    className="flex-1 sm:flex-none px-6 py-2.5 bg-rose-600 hover:bg-rose-700 text-white rounded-lg flex items-center justify-center gap-2 font-medium text-sm transition-all shadow-lg shadow-rose-900/20"
+                  >
+                    {isSaving ? (
+                      <Loader2 className="w-4 h-4 animate-spin" />
+                    ) : (
+                      <Save className="w-4 h-4" />
+                    )}
+                    Save Changes
+                  </button>
+                </div>
               </div>
             </form>
           </div>

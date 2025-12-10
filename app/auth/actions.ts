@@ -28,7 +28,6 @@ interface AuthResponse {
 
 export async function createUserProfile(data: UserFormData): Promise<CreateUserResponse> {
   try {
-    // Check if user with this email already exists
     const existingUser = await prisma.user.findUnique({
       where: {
         email: data.email,
@@ -45,7 +44,6 @@ export async function createUserProfile(data: UserFormData): Promise<CreateUserR
       };
     }
 
-    // Check if username is provided and already exists
     if (data.username) {
       const existingUsername = await prisma.user.findUnique({
         where: {
@@ -62,10 +60,8 @@ export async function createUserProfile(data: UserFormData): Promise<CreateUserR
       }
     }
 
-    // Encrypt password using bcryptjs
     const hashedPassword = await bcrypt.hash(data.password, 10);
 
-    // Create the new user
     const newUser = await prisma.user.create({
       data: {
         email: data.email,

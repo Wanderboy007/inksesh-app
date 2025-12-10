@@ -5,16 +5,16 @@ import { UTApi } from "uploadthing/server";
 
 const utapi = new UTApi();
 
-// Define the shape of the input
 type ImageInput = {
   url: string;
-  id: string;        // The Instagram ID
-  permalink?: string; // The Instagram Post Link
+  id: string;
+  caption?: string;
+  permalink?: string;
 };
 
 export async function uploadAndSaveSelectedImages(
   userId: string,
-  images: ImageInput[] // <--- Changed from string[] to ImageInput[]
+  images: ImageInput[]
 ) {
   if (!userId || images.length === 0) {
     throw new Error("Missing user ID or images");
@@ -23,13 +23,9 @@ export async function uploadAndSaveSelectedImages(
   console.log(`🚀 Starting upload for ${images.length} images...`);
 
   try {
-    // 1. Upload to UploadThing
-    // We only pass the URLs to UploadThing
     const urls = images.map((img) => img.url);
     const uploadResults = await utapi.uploadFilesFromUrl(urls);
 
-    // 2. Map results back to original metadata
-    // UploadThing returns results in the same order as the input array
     const successfulUploads = uploadResults.map((res, index) => {
       if (res.data) {
         return {
@@ -37,9 +33,7 @@ export async function uploadAndSaveSelectedImages(
           igMediaId: images[index].id,
           igPermalink: images[index].permalink,
         };
-      } 
-      
-      // ADD THIS LOGGING BLOCK
+      }
       if (res.error) {
         console.error(`❌ Image ${index} failed:`, res.error);
       }
@@ -50,27 +44,21 @@ export async function uploadAndSaveSelectedImages(
       throw new Error("All uploads failed");
     }
 
-    // 3. Create Records in Prisma
-    // We initialize fields as empty/default so AI can populate them later
     const createdDesigns = await prisma.$transaction(
       successfulUploads.map((file) =>
         prisma.design.create({
           data: {
             userId: userId,
             imageUrl: file!.uploadUrl,
-            
-            // --- Storing Instagram Metadata ---
             igMediaId: file!.igMediaId,
             igPermalink: file!.igPermalink,
-
-            // --- Empty Defaults for AI ---
             title: "Untitled Upload",
             caption: "", 
-            gender: "UNISEX", // Required Enum default
-            size: "MEDIUM",   // Required Enum default
-            bodyPart: "",     // Empty string, AI will fix
-            styles: [],       // Empty array
-            themes: [],       // Empty array
+            gender: "UNISEX",
+            size: "MEDIUM",
+            bodyPart: "",
+            styles: [],
+            themes: [],
           },
         })
       )
@@ -80,7 +68,6 @@ export async function uploadAndSaveSelectedImages(
 
     console.log("🤖 Starting AI Analysis for:", designIds);
 
-    // 4. Call AI Endpoint Directly
     try {
       const aiResponse = await fetch(
         `${process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000"}/api/ai/generatematadata`,
@@ -101,7 +88,6 @@ export async function uploadAndSaveSelectedImages(
       console.log("✅ AI Success:", aiData);
     } catch (aiError) {
       console.error("⚠️ AI Analysis warning (designs still saved):", aiError);
-      // Continue even if AI fails - designs are already saved
     }
 
     return { 

@@ -4,7 +4,6 @@ import { useState } from "react";
 import { Check, Loader2, Image as ImageIcon } from "lucide-react";
 import Image from "next/image";
 
-// --- Types ---
 export interface GalleryImage {
   id: string;
   url: string;
@@ -39,7 +38,6 @@ export function SelectFromGallery({
     onConfirm(selectedIds);
   };
 
-  // --- No Images State ---
   if (images.length === 0) {
     return (
       <div className="flex flex-col items-center justify-center py-32 text-neutral-500">
@@ -53,7 +51,6 @@ export function SelectFromGallery({
 
   return (
     <div className="w-full max-w-7xl mx-auto pb-32 px-4 sm:px-6">
-      {/* --- Header Section --- */}
       <div className="flex flex-col md:flex-row md:items-end justify-between gap-4 mb-8 pt-6">
         <div>
           <h2 className="text-3xl font-bold tracking-tighter text-neutral-900 dark:text-white">
@@ -64,7 +61,6 @@ export function SelectFromGallery({
           </p>
         </div>
 
-        {/* Counter */}
         <div className="flex items-center gap-2 bg-neutral-100 dark:bg-neutral-900 px-4 py-2 rounded-full border border-neutral-200 dark:border-neutral-800">
           <span
             className={`font-bold ${
@@ -79,7 +75,6 @@ export function SelectFromGallery({
         </div>
       </div>
 
-      {/* --- Simple Grid Layout --- */}
       <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-3 sm:gap-4">
         {images.map((image) => {
           const isSelected = selectedIds.includes(image.id);
@@ -97,7 +92,6 @@ export function SelectFromGallery({
                 }
               `}
             >
-              {/* Image */}
               <Image
                 src={image.url}
                 alt={image.caption || "Tattoo"}
@@ -110,7 +104,6 @@ export function SelectFromGallery({
                 sizes="(max-width: 768px) 50vw, (max-width: 1200px) 25vw, 16vw"
               />
 
-              {/* Selection Checkmark (Centered) */}
               {isSelected && (
                 <div className="absolute inset-0 flex items-center justify-center z-10 animate-in zoom-in-50 duration-200">
                   <div className="bg-rose-600 text-white rounded-full p-3 shadow-lg shadow-rose-600/30">
@@ -123,7 +116,6 @@ export function SelectFromGallery({
         })}
       </div>
 
-      {/* --- Sticky Footer --- */}
       <div className="fixed bottom-0 left-0 right-0 z-40 p-4">
         <div className="max-w-md mx-auto">
           <button

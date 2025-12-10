@@ -21,7 +21,6 @@ export default function Step2SelectContent() {
   const [isAnalyzing, setIsAnalyzing] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  // 1. Fetch Instagram Posts
   useEffect(() => {
     if (!userId) {
       setError("User ID is missing. Please go back and try again.");
@@ -71,7 +70,6 @@ export default function Step2SelectContent() {
     fetchInstagram();
   }, [userId, instagramUrl]);
 
-  // 2. Handle Confirmation
   const handleSelectionConfirmed = async (selectedIds: string[]) => {
     if (!userId) {
       alert("User ID missing. Please restart.");
