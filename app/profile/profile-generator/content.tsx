@@ -101,7 +101,7 @@ export default function Step2SelectContent() {
       setIsAnalyzing(true);
 
       // Small delay to show success message
-      await new Promise(resolve => setTimeout(resolve, 1500));
+      await new Promise((resolve) => setTimeout(resolve, 1500));
 
       setIsAnalyzing(false);
       if (result.redirectUrl) {
