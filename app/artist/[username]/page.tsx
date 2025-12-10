@@ -63,10 +63,10 @@ export default async function PublicArtistPage(props: Props) {
               className="object-cover blur-[60px] opacity-60 scale-125"
             />
             <div className="absolute inset-0 bg-neutral-950/40" />
-            <div className="absolute inset-0 bg-gradient-to-t from-neutral-950 via-neutral-950/40 to-transparent" />
+            <div className="absolute inset-0 bg-linear-to-t from-neutral-950 via-neutral-950/40 to-transparent" />
           </>
         ) : (
-          <div className="absolute inset-0 bg-gradient-to-b from-neutral-900 to-neutral-950" />
+          <div className="absolute inset-0 bg-linear-to-b from-neutral-900 to-neutral-950" />
         )}
       </header>
 
@@ -171,7 +171,7 @@ export default async function PublicArtistPage(props: Props) {
                   key={design.id}
                   className="
                     group relative 
-                    aspect-[4/5] 
+                    aspect-4/5 
                     bg-neutral-900 
                     rounded-xl overflow-hidden 
                     border border-neutral-800 shadow-sm
@@ -188,7 +188,7 @@ export default async function PublicArtistPage(props: Props) {
                   <div
                     className="
                       absolute inset-0 
-                      bg-gradient-to-t from-black/90 via-black/40 to-transparent
+                      bg-linear-to-t from-black/90 via-black/40 to-transparent
                       md:bg-black/70 md:from-transparent
                       md:opacity-0 md:group-hover:opacity-100 
                       transition duration-300 
