@@ -15,7 +15,7 @@ export default function LandingPage() {
         </div>
 
         {/* Hero Heading with Gradient */}
-        <h1 className="text-5xl md:text-7xl font-bold tracking-tighter bg-clip-text text-transparent bg-gradient-to-b from-neutral-900 to-neutral-500 dark:from-white dark:to-neutral-500 pb-2">
+        <h1 className="text-5xl md:text-7xl font-bold tracking-tighter bg-clip-text text-transparent bg-linear-to-b from-neutral-900 to-neutral-500 dark:from-white dark:to-neutral-500 pb-2">
           InkSesh
         </h1>
 
@@ -29,7 +29,7 @@ export default function LandingPage() {
         {/* Buttons */}
         <div className="flex items-center justify-center gap-4">
           <Link
-            href="/onboarding/onboarding-1-input"
+            href="/auth"
             className="group relative inline-flex h-12 items-center justify-center overflow-hidden rounded-md bg-neutral-900 dark:bg-white px-8 font-medium text-white dark:text-neutral-950 transition-all duration-300 hover:bg-neutral-800 dark:hover:bg-neutral-200 hover:scale-105 shadow-lg shadow-neutral-500/20 dark:shadow-none"
           >
             <span className="mr-2">Get Started</span>

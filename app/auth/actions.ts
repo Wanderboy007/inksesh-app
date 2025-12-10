@@ -10,20 +10,20 @@ interface UserFormData {
   password: string;
 }
 
-interface UserResponse {
-  id: string;
-  email: string;
-  username: string;
-  profileUrl: string | null;
-}
-
 interface CreateUserResponse {
   success: boolean;
   message: string;
-  user?: UserResponse;
+  user?: any;
   error?: string;
   userExists?: boolean;
   userId?: string;
+}
+
+interface AuthResponse {
+  success: boolean;
+  message: string;
+  userId?: string;
+  error?: string;
 }
 
 export async function createUserProfile(data: UserFormData): Promise<CreateUserResponse> {
@@ -32,12 +32,6 @@ export async function createUserProfile(data: UserFormData): Promise<CreateUserR
     const existingUser = await prisma.user.findUnique({
       where: {
         email: data.email,
-      },
-      select: {
-        id: true,
-        email: true,
-        username: true,
-        profileUrl: true,
       },
     });
 
@@ -53,7 +47,7 @@ export async function createUserProfile(data: UserFormData): Promise<CreateUserR
 
     // Check if username is provided and already exists
     if (data.username) {
-      const existingUsername = await prisma.user.findFirst({
+      const existingUsername = await prisma.user.findUnique({
         where: {
           username: data.username,
         },
@@ -105,5 +99,38 @@ export async function createUserProfile(data: UserFormData): Promise<CreateUserR
       message: errorMessage,
       error: errorMessage,
     };
+  }
+}
+
+export async function loginUser(data: { email: string; password: string }): Promise<AuthResponse> {
+  try {
+    const user = await prisma.user.findUnique({
+      where: { email: data.email },
+      select: {
+        id: true,
+        password: true,
+      },
+    });
+
+    if (!user) {
+      return { success: false, message: "Invalid credentials", error: 'USER_NOT_FOUND' };
+    }
+
+    const isValid = await bcrypt.compare(data.password, user.password);
+
+    if (!isValid) {
+      return { success: false, message: "Invalid credentials", error: 'INVALID_PASSWORD' };
+    }
+
+    // TODO: Create Session Here (Cookie/JWT)
+    
+    return { 
+      success: true, 
+      message: "Logged in successfully",
+      userId: user.id 
+    };
+  } catch (error) {
+    console.error("Login error:", error);
+    return { success: false, message: "Something went wrong" };
   }
 }

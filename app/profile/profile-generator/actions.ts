@@ -34,10 +34,14 @@ export async function uploadAndSaveSelectedImages(
       if (res.data) {
         return {
           uploadUrl: res.data.url,
-          // We grab the metadata from the original array using the index
           igMediaId: images[index].id,
           igPermalink: images[index].permalink,
         };
+      } 
+      
+      // ADD THIS LOGGING BLOCK
+      if (res.error) {
+        console.error(`❌ Image ${index} failed:`, res.error);
       }
       return null;
     }).filter((item) => item !== null);

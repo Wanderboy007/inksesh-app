@@ -12,7 +12,7 @@ import {
   Save,
   Loader2,
 } from "lucide-react";
-import { updateDesign } from "@/app/designs/actions";
+import { updateDesign } from "@/app/profile/actions";
 
 // --- TYPES ---
 type Design = {

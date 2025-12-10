@@ -7,7 +7,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
 import { Sparkles, Loader2 } from "lucide-react";
 import { toast } from "sonner";
-import { createUserProfile } from "@/app/onboarding/onboarding-1-input/actions";
+import { createUserProfile } from "@/app/auth/actions";
 
 const formSchema = z.object({
   email: z.string().email("Please enter a valid email address"),
@@ -26,7 +26,7 @@ const formSchema = z.object({
 
 type UserFormData = z.infer<typeof formSchema>;
 
-export default function UserProfileForm() {
+export default function SignUpForm() {
   const router = useRouter();
   const [userExists, setUserExists] = useState(false);
 
@@ -50,24 +50,6 @@ export default function UserProfileForm() {
   const profileUrlValue = watch("profileUrl");
   const emailValue = watch("email");
 
-  // Load saved Instagram URL and email from localStorage on mount
-  useEffect(() => {
-    const savedInstagramUrl = localStorage.getItem("instagramUrl");
-    const savedEmail = localStorage.getItem("userEmail");
-
-    if (savedInstagramUrl) {
-      setValue("profileUrl", savedInstagramUrl, {
-        shouldValidate: true,
-      });
-    }
-
-    if (savedEmail) {
-      setValue("email", savedEmail, {
-        shouldValidate: true,
-      });
-    }
-  }, [setValue]);
-
   // Save email to localStorage
   useEffect(() => {
     if (emailValue) {
@@ -75,11 +57,9 @@ export default function UserProfileForm() {
     }
   }, [emailValue]);
 
-  // Extract username from Instagram URL and save to localStorage
+  // Extract username from Instagram URL
   useEffect(() => {
     if (!profileUrlValue) return;
-
-    localStorage.setItem("instagramUrl", profileUrlValue);
 
     const match = profileUrlValue.match(/instagram\.com\/([^/?#&]+)/);
 
@@ -97,32 +77,14 @@ export default function UserProfileForm() {
     try {
       const result = await createUserProfile(data);
 
-      if (result.userExists) {
-        setUserExists(true);
-        toast.info("User account already exists. Proceeding to next step.");
-
-        // Redirect to onboarding-2-select after 1 second
-        setTimeout(() => {
-          const instagramUrl = localStorage.getItem("instagramUrl") || "";
-          router.push(
-            `/onboarding/onboarding-2-select?userId=${
-              result.userId
-            }&instagramUrl=${encodeURIComponent(instagramUrl)}`
-          );
-        }, 1000);
-      } else if (result.success && result.user) {
+      if (result.success && result.user) {
         toast.success(result.message);
         console.log("User created successfully:", result.user);
         reset();
 
-        // Redirect to onboarding-2-select after success
+        // Redirect to /profile after success
         setTimeout(() => {
-          const instagramUrl = localStorage.getItem("instagramUrl") || "";
-          router.push(
-            `/onboarding/onboarding-2-select?userId=${
-              result.user.id
-            }&instagramUrl=${encodeURIComponent(instagramUrl)}`
-          );
+          router.push(`/profile/profile-generator?userId=${result.user.id}`);
         }, 500);
       } else {
         toast.error(result.message);
