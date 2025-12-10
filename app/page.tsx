@@ -37,7 +37,7 @@ export default function LandingPage() {
           </Link>
 
           <Link
-            href="/designs"
+            href="/discover"
             className="inline-flex h-12 items-center justify-center px-8 font-medium text-neutral-900 dark:text-white transition-colors hover:text-rose-600 dark:hover:text-rose-400"
           >
             Browse Gallery

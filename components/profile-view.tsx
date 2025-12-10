@@ -40,6 +40,9 @@ export function ProfileView({ user }: { user: UserProfile }) {
   const [editingDesign, setEditingDesign] = useState<Design | null>(null);
   const [isSaving, setIsSaving] = useState(false);
 
+  // --- DYNAMIC HEADER IMAGE ---
+  const headerImage = designs.length > 0 ? designs[0].imageUrl : null;
+
   // --- FILTER LOGIC ---
   const uniqueTags = useMemo(() => {
     const tags = new Set<string>();
@@ -71,7 +74,6 @@ export function ProfileView({ user }: { user: UserProfile }) {
         ? {
             ...d,
             title: formData.get("title") as string,
-            // 👇 Added Caption Update Logic
             caption: formData.get("caption") as string,
             styles: (formData.get("styles") as string)
               .split(",")
@@ -96,35 +98,64 @@ export function ProfileView({ user }: { user: UserProfile }) {
   return (
     <div className="min-h-screen bg-neutral-950 text-white pb-20 relative">
       {/* --- HERO HEADER --- */}
-      <header className="relative w-full h-64 bg-gradient-to-b from-neutral-900 to-neutral-950 border-b border-white/5">
-        <div className="absolute inset-0 bg-[url('https://grainy-gradients.vercel.app/noise.svg')] opacity-20 pointer-events-none"></div>
+      <header className="relative w-full h-56 md:h-80 border-b border-white/5 overflow-hidden transition-all duration-500">
+        {/* 1. Dynamic Background Layer */}
+        {headerImage ? (
+          <>
+            <Image
+              src={headerImage}
+              alt="Profile Mood Background"
+              fill
+              className="object-cover blur-[60px] md:blur-[100px] opacity-60 scale-125"
+              priority
+            />
+            <div className="absolute inset-0 bg-neutral-950/40" />
+            <div className="absolute inset-0 bg-gradient-to-t from-neutral-950 via-neutral-950/20 to-transparent" />
+          </>
+        ) : (
+          <div className="absolute inset-0 bg-gradient-to-b from-neutral-900 to-neutral-950" />
+        )}
 
-        <div className="max-w-7xl mx-auto px-6 h-full flex flex-col justify-end pb-8 relative z-10">
-          <div className="flex items-end gap-6">
-            <div className="w-24 h-24 rounded-full bg-neutral-800 border-4 border-neutral-950 overflow-hidden shadow-2xl relative">
-              <div className="w-full h-full flex items-center justify-center bg-rose-600 text-3xl font-bold">
+        <div className="absolute inset-0 bg-[url('https://grainy-gradients.vercel.app/noise.svg')] opacity-20 pointer-events-none mix-blend-overlay"></div>
+
+        {/* 4. Header Content */}
+        <div className="max-w-7xl mx-auto px-4 md:px-6 h-full flex flex-col justify-end pb-6 md:pb-8 relative z-10">
+          <div className="flex items-end gap-4 md:gap-8">
+            <div className="w-20 h-20 md:w-32 md:h-32 rounded-full bg-neutral-800 border-4 border-neutral-950 overflow-hidden shadow-2xl relative flex-shrink-0">
+              <div className="w-full h-full flex items-center justify-center bg-rose-600 text-2xl md:text-4xl font-bold">
                 {user.username?.[0]?.toUpperCase() || "U"}
               </div>
             </div>
-            <div className="mb-2">
-              <h1 className="text-3xl font-bold tracking-tight">
+
+            <div className="mb-1 md:mb-3 flex-1 min-w-0">
+              <h1 className="text-2xl md:text-5xl font-bold tracking-tight drop-shadow-md truncate">
                 {user.username || "Tattoo Artist"}
               </h1>
-              <div className="flex items-center gap-4 text-sm text-neutral-400 mt-2">
-                <a
-                  href={user.profileUrl || "#"}
-                  target="_blank"
-                  className="flex items-center gap-1 hover:text-rose-400 transition-colors"
-                >
-                  <Instagram className="w-4 h-4" />
-                  <span>@{user.username || "artist"}</span>
-                </a>
+              <div className="flex flex-wrap items-center gap-x-4 gap-y-1 text-xs md:text-sm text-neutral-300 mt-1 md:mt-2 font-medium drop-shadow-sm">
+                {user.profileUrl ? (
+                  <a
+                    href={user.profileUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="flex items-center gap-1 hover:text-rose-400 transition-colors cursor-pointer"
+                  >
+                    <Instagram className="w-3 h-3 md:w-4 md:h-4" />
+                    <span className="truncate max-w-[150px] md:max-w-none">
+                      @{user.username || "artist"}
+                    </span>
+                  </a>
+                ) : (
+                  <div className="flex items-center gap-1 opacity-50 cursor-not-allowed">
+                    <Instagram className="w-3 h-3 md:w-4 md:h-4" />
+                    <span>@{user.username || "artist"}</span>
+                  </div>
+                )}
                 <span className="flex items-center gap-1">
-                  <MapPin className="w-4 h-4" />
+                  <MapPin className="w-3 h-3 md:w-4 md:h-4" />
                   <span>Trivandrum, India</span>
                 </span>
                 <span className="flex items-center gap-1">
-                  <Layers className="w-4 h-4" />
+                  <Layers className="w-3 h-3 md:w-4 md:h-4" />
                   <span>{designs.length} Designs</span>
                 </span>
               </div>
@@ -134,12 +165,12 @@ export function ProfileView({ user }: { user: UserProfile }) {
       </header>
 
       {/* --- FILTER BAR --- */}
-      <div className="sticky top-0 z-30 bg-neutral-950/80 backdrop-blur-md border-b border-white/5 py-4 px-6 transition-all">
+      <div className="sticky top-0 z-30 bg-neutral-950/80 backdrop-blur-md border-b border-white/5 py-3 md:py-4 px-4 md:px-6 transition-all">
         <div className="max-w-7xl mx-auto flex items-center justify-between gap-4">
-          <div className="flex gap-2 overflow-x-auto pb-1 no-scrollbar">
+          <div className="flex gap-2 overflow-x-auto pb-1 no-scrollbar mask-gradient-right">
             <button
               onClick={() => setActiveFilter(null)}
-              className={`px-4 py-1.5 rounded-full text-sm font-medium whitespace-nowrap transition-all ${
+              className={`px-3 md:px-4 py-1.5 rounded-full text-xs md:text-sm font-medium whitespace-nowrap transition-all ${
                 activeFilter === null
                   ? "bg-white text-black"
                   : "bg-neutral-900 border border-neutral-800 text-neutral-400 hover:text-white"
@@ -151,7 +182,7 @@ export function ProfileView({ user }: { user: UserProfile }) {
               <button
                 key={tag}
                 onClick={() => setActiveFilter(tag)}
-                className={`px-4 py-1.5 rounded-full text-sm font-medium whitespace-nowrap transition-all ${
+                className={`px-3 md:px-4 py-1.5 rounded-full text-xs md:text-sm font-medium whitespace-nowrap transition-all ${
                   activeFilter === tag
                     ? "bg-rose-600 text-white"
                     : "bg-neutral-900 border border-neutral-800 text-neutral-400 hover:text-white"
@@ -164,7 +195,7 @@ export function ProfileView({ user }: { user: UserProfile }) {
           {activeFilter && (
             <button
               onClick={() => setActiveFilter(null)}
-              className="p-2 bg-neutral-800 rounded-full hover:bg-neutral-700 text-white"
+              className="p-1.5 md:p-2 bg-neutral-800 rounded-full hover:bg-neutral-700 text-white flex-shrink-0"
             >
               <X className="w-4 h-4" />
             </button>
@@ -173,14 +204,14 @@ export function ProfileView({ user }: { user: UserProfile }) {
       </div>
 
       {/* --- GRID --- */}
-      <div className="max-w-7xl mx-auto px-6 mt-8">
-        <div className="mb-6 text-sm text-neutral-500">
+      <div className="max-w-7xl mx-auto px-2 md:px-6 mt-4 md:mt-8">
+        <div className="mb-4 md:mb-6 px-2 text-xs md:text-sm text-neutral-500">
           Showing {filteredDesigns.length}{" "}
           {activeFilter ? `"${activeFilter}"` : ""} designs
         </div>
 
         {filteredDesigns.length === 0 ? (
-          <div className="text-center py-20 bg-neutral-900/50 rounded-2xl border border-neutral-800 border-dashed">
+          <div className="mx-2 text-center py-20 bg-neutral-900/50 rounded-2xl border border-neutral-800 border-dashed">
             <Filter className="w-12 h-12 text-neutral-800 mx-auto mb-4" />
             <p className="text-neutral-500">No designs match this filter.</p>
             <button
@@ -191,13 +222,18 @@ export function ProfileView({ user }: { user: UserProfile }) {
             </button>
           </div>
         ) : (
-          <div className="columns-1 sm:columns-2 md:columns-3 lg:columns-4 gap-4 space-y-4">
+          /* UPDATED GRID:
+             - columns-2 on mobile (gap-2)
+             - columns-3 on tablet
+             - columns-4 on desktop (gap-4)
+          */
+          <div className="columns-2 md:columns-3 lg:columns-4 gap-2 md:gap-4 space-y-2 md:space-y-4">
             {filteredDesigns.map((design) => (
               <div
                 key={design.id}
-                className="break-inside-avoid bg-neutral-900 rounded-xl overflow-hidden border border-neutral-800 hover:border-rose-500/50 transition-all group relative"
+                className="break-inside-avoid bg-neutral-900 rounded-lg md:rounded-xl overflow-hidden border border-neutral-800 hover:border-rose-500/50 transition-all group relative mb-2 md:mb-4"
               >
-                <div className="relative w-full aspect-[3/4]">
+                <div className="relative w-full">
                   <Image
                     src={design.imageUrl}
                     alt={design.title}
@@ -206,21 +242,25 @@ export function ProfileView({ user }: { user: UserProfile }) {
                     className="w-full h-auto object-cover"
                   />
 
-                  <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity duration-200 flex flex-col justify-end p-4">
+                  {/* Overlay: Subtle on mobile, full on desktop hover */}
+                  <div className="absolute inset-0 bg-black/20 md:bg-black/60 md:opacity-0 md:group-hover:opacity-100 transition-opacity duration-200 flex flex-col justify-end p-2 md:p-4">
+                    {/* Edit Button: Smaller on mobile */}
                     <button
                       onClick={(e) => {
                         e.stopPropagation();
                         setEditingDesign(design);
                       }}
-                      className="absolute top-2 right-2 p-2 bg-white/10 hover:bg-rose-600 text-white rounded-full backdrop-blur-md transition-colors"
+                      className="absolute top-2 right-2 p-1.5 md:p-2 bg-black/40 md:bg-white/10 hover:bg-rose-600 text-white rounded-full backdrop-blur-md transition-colors"
                     >
-                      <Pencil className="w-4 h-4" />
+                      <Pencil className="w-3 h-3 md:w-4 md:h-4" />
                     </button>
 
-                    <h3 className="text-white font-bold text-lg leading-tight">
+                    <h3 className="text-white font-bold text-xs md:text-lg leading-tight truncate md:whitespace-normal drop-shadow-md">
                       {design.title || "Untitled"}
                     </h3>
-                    <div className="flex flex-wrap gap-1.5 mt-3">
+
+                    {/* Tags: Hidden on Mobile to save space, visible on Desktop */}
+                    <div className="hidden md:flex flex-wrap gap-1.5 mt-3">
                       {[...design.styles, ...design.themes]
                         .slice(0, 3)
                         .map((t) => (
@@ -243,7 +283,7 @@ export function ProfileView({ user }: { user: UserProfile }) {
       {/* --- EDIT MODAL --- */}
       {editingDesign && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm p-4 animate-in fade-in">
-          <div className="bg-neutral-900 border border-neutral-800 w-full max-w-md rounded-2xl p-6 shadow-2xl relative">
+          <div className="bg-neutral-900 border border-neutral-800 w-full max-w-md rounded-2xl p-6 shadow-2xl relative max-h-[90vh] overflow-y-auto">
             <button
               onClick={() => setEditingDesign(null)}
               className="absolute top-4 right-4 text-neutral-500 hover:text-white"
@@ -254,7 +294,6 @@ export function ProfileView({ user }: { user: UserProfile }) {
             <h2 className="text-xl font-bold mb-6">Edit Tattoo Details</h2>
 
             <form onSubmit={handleSave} className="space-y-4">
-              {/* Title Field */}
               <div>
                 <label className="text-xs font-semibold text-neutral-500 uppercase tracking-wider">
                   Title
@@ -266,7 +305,6 @@ export function ProfileView({ user }: { user: UserProfile }) {
                 />
               </div>
 
-              {/* 👇 NEW: Caption Field */}
               <div>
                 <label className="text-xs font-semibold text-neutral-500 uppercase tracking-wider">
                   Caption
@@ -279,7 +317,6 @@ export function ProfileView({ user }: { user: UserProfile }) {
                 />
               </div>
 
-              {/* Styles Field */}
               <div>
                 <label className="text-xs font-semibold text-neutral-500 uppercase tracking-wider">
                   Styles (Comma separated)
@@ -291,7 +328,6 @@ export function ProfileView({ user }: { user: UserProfile }) {
                 />
               </div>
 
-              {/* Themes Field */}
               <div>
                 <label className="text-xs font-semibold text-neutral-500 uppercase tracking-wider">
                   Themes (Comma separated)
@@ -303,19 +339,18 @@ export function ProfileView({ user }: { user: UserProfile }) {
                 />
               </div>
 
-              {/* Actions */}
-              <div className="flex justify-end gap-3 mt-6">
+              <div className="flex justify-end gap-3 mt-6 pt-2 border-t border-neutral-800">
                 <button
                   type="button"
                   onClick={() => setEditingDesign(null)}
-                  className="px-4 py-2 text-neutral-400 hover:text-white"
+                  className="px-4 py-2 text-neutral-400 hover:text-white text-sm"
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
                   disabled={isSaving}
-                  className="px-6 py-2 bg-rose-600 hover:bg-rose-700 text-white rounded-lg flex items-center gap-2 font-medium"
+                  className="px-6 py-2 bg-rose-600 hover:bg-rose-700 text-white rounded-lg flex items-center gap-2 font-medium text-sm"
                 >
                   {isSaving ? (
                     <Loader2 className="w-4 h-4 animate-spin" />
