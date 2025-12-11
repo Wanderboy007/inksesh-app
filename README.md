@@ -243,21 +243,9 @@ bun prisma generate       # Generate Prisma client
 
 ---
 
-## 🤝 Contributing
-
-Contributions are welcome! Please feel free to submit a Pull Request.
-
----
-
-## 📄 License
-
-This project is private and proprietary.
-
----
-
 ## 👨‍💻 Author
 
-**Wanderboy007** — [GitHub](https://github.com/Wanderboy007)
+**Tejas Chavhan** — [GitHub](https://github.com/Wanderboy007)
 
 ---
 
