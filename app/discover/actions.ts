@@ -1,6 +1,7 @@
 "use server";
 
 import { prisma } from "@/lib/db/prisma";
+import { Gender, TattooSize } from "@/app/generated/prisma/enums";
 
 export type DiscoverDesign = {
   id: string;
@@ -105,5 +106,24 @@ export async function getDiscoverDesigns(options?: {
     })),
     total,
     categories,
+  };
+}
+
+export type FilterOptions = {
+  genders: string[];
+  sizes: string[];
+  bodyParts: string[];
+};
+
+export async function getFilterOptions(): Promise<FilterOptions> {
+  const bodyParts = await prisma.design.findMany({
+    select: { bodyPart: true },
+    distinct: ["bodyPart"],
+  });
+
+  return {
+    genders: Object.values(Gender),
+    sizes: Object.values(TattooSize),
+    bodyParts: bodyParts.map((d) => d.bodyPart).sort(),
   };
 }

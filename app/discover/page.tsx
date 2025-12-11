@@ -1,21 +1,173 @@
 "use client";
 
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useRef } from "react";
 import Image from "next/image";
 import Link from "next/link";
-import { Search, TrendingUp, Sparkles, Loader2 } from "lucide-react";
-import { getDiscoverDesigns, type DiscoverDesign } from "./actions";
+import {
+  Search,
+  Sparkles,
+  Loader2,
+  ChevronDown,
+  X,
+  SlidersHorizontal,
+} from "lucide-react";
+import {
+  getDiscoverDesigns,
+  getFilterOptions,
+  type DiscoverDesign,
+  type FilterOptions,
+} from "./actions";
 
 const formatText = (text: string) => text.toLowerCase().replace(/_/g, " ");
 
+type DropdownProps = {
+  label: string;
+  options: string[];
+  selected: string | null;
+  onSelect: (value: string | null) => void;
+  color: "rose" | "blue" | "purple";
+  linkMode?: boolean;
+};
+
+function FilterDropdown({
+  label,
+  options,
+  selected,
+  onSelect,
+  color,
+  linkMode,
+}: DropdownProps) {
+  const [isOpen, setIsOpen] = useState(false);
+  const ref = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const handleClickOutside = (e: MouseEvent) => {
+      if (ref.current && !ref.current.contains(e.target as Node)) {
+        setIsOpen(false);
+      }
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
+
+  const colorStyles = {
+    rose: {
+      active: "bg-rose-600 border-rose-500 text-white",
+      hover: "hover:bg-rose-500/20 hover:text-rose-300",
+      ring: "ring-rose-500/30",
+    },
+    blue: {
+      active: "bg-blue-600 border-blue-500 text-white",
+      hover: "hover:bg-blue-500/20 hover:text-blue-300",
+      ring: "ring-blue-500/30",
+    },
+    purple: {
+      active: "bg-purple-600 border-purple-500 text-white",
+      hover: "hover:bg-purple-500/20 hover:text-purple-300",
+      ring: "ring-purple-500/30",
+    },
+  };
+
+  return (
+    <div ref={ref} className="relative">
+      <button
+        onClick={() => setIsOpen(!isOpen)}
+        className={`
+          flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium transition-all border
+          ${
+            selected
+              ? colorStyles[color].active
+              : "bg-neutral-900 border-neutral-800 text-neutral-400 hover:text-white hover:border-neutral-700"
+          }
+        `}
+      >
+        <span className="capitalize">
+          {selected ? formatText(selected) : label}
+        </span>
+        <ChevronDown
+          className={`w-3.5 h-3.5 transition-transform ${
+            isOpen ? "rotate-180" : ""
+          }`}
+        />
+      </button>
+
+      {isOpen && (
+        <div
+          className={`absolute top-full left-0 mt-2 min-w-[160px] max-h-[280px] overflow-y-auto bg-neutral-900 border border-neutral-800 rounded-xl shadow-xl z-50 py-1
+          [&::-webkit-scrollbar]:w-1.5
+          [&::-webkit-scrollbar-track]:bg-transparent
+          [&::-webkit-scrollbar-thumb]:bg-neutral-700
+          [&::-webkit-scrollbar-thumb]:rounded-full
+        `}
+        >
+          {selected && (
+            <button
+              onClick={() => {
+                onSelect(null);
+                setIsOpen(false);
+              }}
+              className="w-full px-3 py-2 text-left text-sm text-neutral-500 hover:bg-neutral-800 hover:text-white flex items-center gap-2 border-b border-neutral-800"
+            >
+              <X className="w-3 h-3" />
+              Clear
+            </button>
+          )}
+          {options.map((opt) =>
+            linkMode ? (
+              <Link
+                key={opt}
+                href={`/discover/${encodeURIComponent(
+                  opt.toLowerCase().replace(/_/g, "-")
+                )}`}
+                className={`block w-full px-3 py-2 text-left text-sm capitalize transition-colors ${
+                  colorStyles[color].hover
+                } ${
+                  selected === opt
+                    ? "bg-neutral-800 text-white"
+                    : "text-neutral-400"
+                }`}
+                onClick={() => setIsOpen(false)}
+              >
+                {formatText(opt)}
+              </Link>
+            ) : (
+              <button
+                key={opt}
+                onClick={() => {
+                  onSelect(opt);
+                  setIsOpen(false);
+                }}
+                className={`w-full px-3 py-2 text-left text-sm capitalize transition-colors ${
+                  colorStyles[color].hover
+                } ${
+                  selected === opt
+                    ? "bg-neutral-800 text-white"
+                    : "text-neutral-400"
+                }`}
+              >
+                {formatText(opt)}
+              </button>
+            )
+          )}
+        </div>
+      )}
+    </div>
+  );
+}
+
 export default function DiscoverPage() {
-  const [activeCategory, setActiveCategory] = useState("All");
   const [searchQuery, setSearchQuery] = useState("");
   const [debouncedSearch, setDebouncedSearch] = useState("");
   const [designs, setDesigns] = useState<DiscoverDesign[]>([]);
-  const [categories, setCategories] = useState<string[]>(["All", "Trending"]);
   const [isLoading, setIsLoading] = useState(true);
   const [total, setTotal] = useState(0);
+  const [filterOptions, setFilterOptions] = useState<FilterOptions | null>(
+    null
+  );
+
+  // Quick filter states (for in-page filtering)
+  const [styleFilter, setStyleFilter] = useState<string | null>(null);
+  const [styles, setStyles] = useState<string[]>([]);
 
   useEffect(() => {
     const timer = setTimeout(() => {
@@ -24,28 +176,43 @@ export default function DiscoverPage() {
     return () => clearTimeout(timer);
   }, [searchQuery]);
 
+  // Fetch filter options on mount
+  useEffect(() => {
+    getFilterOptions().then(setFilterOptions).catch(console.error);
+  }, []);
+
   const fetchDesigns = useCallback(async () => {
     setIsLoading(true);
     try {
       const result = await getDiscoverDesigns({
-        category: activeCategory,
+        category: styleFilter || "All",
         search: debouncedSearch,
       });
       setDesigns(result.designs);
       setTotal(result.total);
+      // Extract unique styles for quick filtering
       if (result.categories.length > 2) {
-        setCategories(result.categories);
+        setStyles(
+          result.categories.filter((c) => c !== "All" && c !== "Trending")
+        );
       }
     } catch (error) {
       console.error("Failed to fetch designs:", error);
     } finally {
       setIsLoading(false);
     }
-  }, [activeCategory, debouncedSearch]);
+  }, [styleFilter, debouncedSearch]);
 
   useEffect(() => {
     fetchDesigns();
   }, [fetchDesigns]);
+
+  const hasActiveFilters = styleFilter || debouncedSearch;
+
+  const clearAllFilters = () => {
+    setStyleFilter(null);
+    setSearchQuery("");
+  };
 
   return (
     <div className="min-h-screen bg-neutral-950 text-white pb-20">
@@ -86,31 +253,106 @@ export default function DiscoverPage() {
         </div>
       </section>
 
-      <div className="sticky top-0 z-30 bg-neutral-950/90 backdrop-blur-md border-b border-white/5 py-4">
-        <div
-          className="max-w-7xl mx-auto px-4 md:px-6 flex items-center gap-2 overflow-x-auto pb-2
-          [&::-webkit-scrollbar]:h-1.5
-          [&::-webkit-scrollbar-track]:bg-transparent
-          [&::-webkit-scrollbar-thumb]:bg-neutral-800
-          [&::-webkit-scrollbar-thumb]:rounded-full"
-        >
-          {categories.map((cat) => (
-            <button
-              key={cat}
-              onClick={() => setActiveCategory(cat)}
-              className={`
-                flex items-center gap-2 px-4 py-2 rounded-full text-sm font-medium whitespace-nowrap transition-all border shrink-0
-                ${
-                  activeCategory === cat
-                    ? "bg-rose-600 border-rose-500 text-white shadow-lg shadow-rose-900/20"
-                    : "bg-neutral-900 border-neutral-800 text-neutral-400 hover:text-white hover:border-neutral-700"
-                }
-              `}
-            >
-              {cat === "Trending" && <TrendingUp className="w-3 h-3" />}
-              {cat}
-            </button>
-          ))}
+      <div className="sticky top-0 z-30 bg-neutral-950/95 backdrop-blur-xl border-b border-white/5">
+        <div className="max-w-7xl mx-auto px-4 md:px-6 py-3">
+          <div className="flex flex-col sm:flex-row sm:items-center gap-3">
+            {/* Filter Icon & Label */}
+            <div className="flex items-center gap-2 text-neutral-400 shrink-0">
+              <SlidersHorizontal className="w-4 h-4" />
+              <span className="text-sm font-medium hidden sm:inline">
+                Filter by:
+              </span>
+            </div>
+
+            {/* Filter Dropdowns */}
+            <div className="flex flex-wrap items-center gap-2">
+              {/* Style/Theme Quick Filter (in-page) */}
+              {styles.length > 0 && (
+                <FilterDropdown
+                  label="Style"
+                  options={styles}
+                  selected={styleFilter}
+                  onSelect={setStyleFilter}
+                  color="rose"
+                />
+              )}
+
+              {/* Divider */}
+              {filterOptions && (
+                <div className="hidden sm:block w-px h-6 bg-neutral-800 mx-1" />
+              )}
+
+              {/* SEO Filter Links (navigate to dedicated pages) */}
+              {filterOptions && (
+                <>
+                  <FilterDropdown
+                    label="Gender"
+                    options={filterOptions.genders}
+                    selected={null}
+                    onSelect={() => {}}
+                    color="rose"
+                    linkMode
+                  />
+                  <FilterDropdown
+                    label="Size"
+                    options={filterOptions.sizes}
+                    selected={null}
+                    onSelect={() => {}}
+                    color="blue"
+                    linkMode
+                  />
+                  <FilterDropdown
+                    label="Body Part"
+                    options={filterOptions.bodyParts}
+                    selected={null}
+                    onSelect={() => {}}
+                    color="purple"
+                    linkMode
+                  />
+                </>
+              )}
+            </div>
+
+            {/* Clear Filters */}
+            {hasActiveFilters && (
+              <button
+                onClick={clearAllFilters}
+                className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-neutral-400 hover:text-white bg-neutral-900 hover:bg-neutral-800 border border-neutral-800 rounded-lg transition-all ml-auto"
+              >
+                <X className="w-3 h-3" />
+                Clear all
+              </button>
+            )}
+          </div>
+
+          {/* Active Filter Tags */}
+          {hasActiveFilters && (
+            <div className="flex items-center gap-2 mt-3 pt-3 border-t border-neutral-800/50">
+              <span className="text-xs text-neutral-500">Active:</span>
+              {styleFilter && (
+                <span className="inline-flex items-center gap-1 px-2 py-1 text-xs bg-rose-500/20 text-rose-400 border border-rose-500/30 rounded-full">
+                  {formatText(styleFilter)}
+                  <button
+                    onClick={() => setStyleFilter(null)}
+                    className="hover:text-white"
+                  >
+                    <X className="w-3 h-3" />
+                  </button>
+                </span>
+              )}
+              {debouncedSearch && (
+                <span className="inline-flex items-center gap-1 px-2 py-1 text-xs bg-neutral-800 text-neutral-300 border border-neutral-700 rounded-full">
+                  &quot;{debouncedSearch}&quot;
+                  <button
+                    onClick={() => setSearchQuery("")}
+                    className="hover:text-white"
+                  >
+                    <X className="w-3 h-3" />
+                  </button>
+                </span>
+              )}
+            </div>
+          )}
         </div>
       </div>
 
@@ -119,7 +361,7 @@ export default function DiscoverPage() {
           {isLoading
             ? "Loading..."
             : `Showing ${designs.length} of ${total} designs${
-                activeCategory !== "All" ? ` in "${activeCategory}"` : ""
+                styleFilter ? ` in "${styleFilter}"` : ""
               }${debouncedSearch ? ` matching "${debouncedSearch}"` : ""}`}
         </p>
       </div>
@@ -135,10 +377,7 @@ export default function DiscoverPage() {
             <Search className="w-12 h-12 text-neutral-700 mx-auto mb-4" />
             <p className="text-neutral-500">No designs found.</p>
             <button
-              onClick={() => {
-                setActiveCategory("All");
-                setSearchQuery("");
-              }}
+              onClick={clearAllFilters}
               className="text-rose-500 hover:underline mt-2"
             >
               Clear filters
