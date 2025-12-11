@@ -10,7 +10,6 @@ import { toast } from "sonner";
 import { loginUser } from "@/app/auth/actions";
 import { secureStorage } from "@/lib/secure-storage";
 
-// simpler schema for login
 const signInSchema = z.object({
   email: z.string().email("Please enter a valid email address"),
   password: z.string().min(1, "Password is required"),
@@ -64,7 +63,6 @@ export default function SignInForm() {
 
       <div className="bg-white dark:bg-neutral-900/50 border border-neutral-200 dark:border-neutral-800 backdrop-blur-sm rounded-2xl p-6 sm:p-8 shadow-xl">
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
-          {/* Email */}
           <div className="space-y-2">
             <label className="text-sm font-medium text-neutral-700 dark:text-neutral-300">
               Email
@@ -82,7 +80,6 @@ export default function SignInForm() {
             )}
           </div>
 
-          {/* Password */}
           <div className="space-y-2">
             <label className="text-sm font-medium text-neutral-700 dark:text-neutral-300">
               Password

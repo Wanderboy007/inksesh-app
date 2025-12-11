@@ -1,7 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { ApifyClient } from "apify-client";
 
-// Initialize client (Ensure APIFY_API_TOKEN is in your .env)
 const client = new ApifyClient({
   token: process.env.APIFY_API_TOKEN,
 });
@@ -18,7 +17,6 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    // Prepare Actor Input
     const actorInput = {
       username: [inputUrl], 
       resultsLimit: 5,
@@ -26,12 +24,8 @@ export async function POST(req: NextRequest) {
       searchLimit: 1,
     };
 
-    console.log("🚀 Starting Apify Scraper for:", inputUrl);
-
-    // Run the Actor
     const run = await client.actor("nH2AHrwxeTRJoN5hX").call(actorInput);
 
-    // Fetch results from dataset
     const { items } = await client.dataset(run.defaultDatasetId).listItems();
 
 
@@ -39,7 +33,6 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: "No posts found or profile is private." }, { status: 404 });
     }
     
-    // Remove type filtering - check what the actual data structure is
     const normalizedPosts = items
       .map((item: any) => {
        
@@ -50,13 +43,12 @@ export async function POST(req: NextRequest) {
           permalink: item.url
         };
       })
-      .filter((post: any) => post.url); // Only keep posts with URLs
+      .filter((post: any) => post.url);
     
   
     return NextResponse.json({ posts: normalizedPosts }, { status: 200 });
 
   } catch (error) {
-    console.error("❌ Apify Error:", error);
     return NextResponse.json(
       { error: "Failed to fetch Instagram posts", details: String(error) },
       { status: 500 }

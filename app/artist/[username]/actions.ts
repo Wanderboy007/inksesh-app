@@ -19,7 +19,6 @@ export async function getArtistByUsername(username: string) {
           title: true,
           imageUrl: true,
           styles: true,
-          // 🟢 ADD THESE 3 FIELDS
           gender: true,
           size: true,
           bodyPart: true,

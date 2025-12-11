@@ -11,14 +11,9 @@ export async function generateMetadata(
   props: Props,
   parent: ResolvingMetadata
 ): Promise<Metadata> {
-  // 1. Await parameters (Required for Next.js 15+)
   const searchParams = await props.searchParams;
-
-  // 2. Define the title string (This was missing in your code)
   const mode = searchParams.mode === "edit" ? "Edit" : "Build";
   const titleString = `${mode} Your Tattoo Portfolio - InkSesh`;
-
-  // 3. Get parent images to prevent losing the default OG image
   const parentMetadata = await parent;
   const previousImages = parentMetadata.openGraph?.images || [];
 
@@ -26,7 +21,6 @@ export async function generateMetadata(
     "Create and manage your tattoo design portfolio. Upload your designs, get AI-powered analysis for styles, themes, and body parts.";
 
   return {
-    // 4. USE ABSOLUTE to override the parent layout template
     title: {
       absolute: titleString,
     },

@@ -9,7 +9,7 @@ interface ProfileEditDialogProps {
   onClose: () => void;
   userId: string;
   initialData?: {
-    username: string; // Changed from name
+    username: string;
     instagramUrl: string;
   };
 }
@@ -22,13 +22,11 @@ export function ProfileEditDialog({
 }: ProfileEditDialogProps) {
   const [isLoading, setIsLoading] = useState(false);
 
-  // State uses 'username' now
   const [formData, setFormData] = useState({
     username: "",
     instagramUrl: "",
   });
 
-  // Sync state when data loads
   useEffect(() => {
     if (initialData) {
       setFormData({
@@ -46,7 +44,7 @@ export function ProfileEditDialog({
 
     const data = new FormData();
     data.append("userId", userId);
-    data.append("username", formData.username); // Send username
+    data.append("username", formData.username);
     data.append("instagramUrl", formData.instagramUrl);
 
     try {
@@ -82,7 +80,6 @@ export function ProfileEditDialog({
         </div>
 
         <form onSubmit={handleSubmit} className="p-6 space-y-6">
-          {/* Avatar Area */}
           <div className="flex flex-col items-center gap-3">
             <div className="relative group cursor-pointer">
               <div className="w-24 h-24 rounded-full bg-neutral-800 border-2 border-dashed border-neutral-700 flex items-center justify-center overflow-hidden group-hover:border-rose-500 transition-colors">
@@ -98,14 +95,13 @@ export function ProfileEditDialog({
           </div>
 
           <div className="space-y-4">
-            {/* Username Input */}
             <div className="space-y-2">
               <label className="text-xs font-medium text-neutral-400 uppercase tracking-wider">
                 Username
               </label>
               <input
                 type="text"
-                name="username" // Name matches FormData
+                name="username"
                 value={formData.username}
                 onChange={(e) =>
                   setFormData({ ...formData, username: e.target.value })
@@ -115,7 +111,6 @@ export function ProfileEditDialog({
               />
             </div>
 
-            {/* Profile URL Input */}
             <div className="space-y-2">
               <label className="text-xs font-medium text-neutral-400 uppercase tracking-wider">
                 Instagram / Profile URL

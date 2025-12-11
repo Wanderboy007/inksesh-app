@@ -6,7 +6,6 @@ export default function ArtistLoadingSkeleton() {
       </header>
 
       <div className="max-w-6xl mx-auto px-4 sm:px-6 -mt-28 md:-mt-32 relative z-10">
-        {/* Profile header skeleton */}
         <div className="flex flex-col md:flex-row items-center md:items-start gap-6 md:gap-8 mb-12 md:mb-16 pb-6 md:pb-8 pt-6 md:pt-8 border-b border-neutral-800">
           <div className="relative w-32 h-32 sm:w-40 sm:h-40 md:w-48 md:h-48 shrink-0 rounded-full overflow-hidden bg-neutral-900 animate-pulse" />
 
@@ -24,7 +23,6 @@ export default function ArtistLoadingSkeleton() {
           </div>
         </div>
 
-        {/* Gallery skeleton */}
         <div>
           <div className="h-7 w-32 bg-neutral-900 rounded-md animate-pulse mb-6" />
           <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3 sm:gap-4">

@@ -4,7 +4,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { Sparkles, Plus, Home } from "lucide-react";
 import { secureStorage } from "@/lib/secure-storage";
-import { getUserById } from "@/lib/get-user-info"; // Check path!
+import { getUserById } from "@/lib/get-user-info";
 import { useEffect, useState } from "react";
 import { ProfileEditDialog } from "@/components/profile-edit-dialog";
 
@@ -15,7 +15,6 @@ export function ProfileNavbar() {
   const [profileUrl, setProfileUrl] = useState<string>("");
   const [isEditOpen, setIsEditOpen] = useState(false);
 
-  // Simplified State (No name property)
   const [userInfo, setUserInfo] = useState({
     id: "",
     username: "",
@@ -33,7 +32,6 @@ export function ProfileNavbar() {
         if (result.success && result.user) {
           setProfileUrl(result.user.profileUrl || "");
 
-          // Save result directly
           setUserInfo({
             id: result.user.id,
             username: result.user.username || "",
@@ -50,7 +48,6 @@ export function ProfileNavbar() {
     <>
       <nav className="sticky top-0 z-50 w-full bg-neutral-950/80 backdrop-blur-md border-b border-white/5">
         <div className="max-w-7xl mx-auto px-4 md:px-6 h-16 flex items-center justify-between">
-          {/* LEFT: Logo */}
           <Link
             href="/"
             className="flex items-center gap-2 group transition-opacity hover:opacity-80"
@@ -63,7 +60,6 @@ export function ProfileNavbar() {
             </span>
           </Link>
 
-          {/* RIGHT: Actions */}
           <div className="flex items-center gap-3 md:gap-4">
             {pathname === "/profile/generate" && (
               <Link
@@ -87,14 +83,12 @@ export function ProfileNavbar() {
               </Link>
             )}
 
-            {/* Profile Avatar Trigger */}
             <button
               onClick={() => setIsEditOpen(true)}
               className="relative group outline-none"
             >
               <div className="w-9 h-9 rounded-full bg-neutral-800 border border-neutral-700 flex items-center justify-center overflow-hidden transition-transform group-hover:scale-105 group-active:scale-95 group-focus:ring-2 group-focus:ring-rose-500/50">
                 <span className="text-sm font-bold text-white group-hover:text-rose-400 transition-colors">
-                  {/* Use first letter of Profile URL or Username, else U */}
                   {profileUrl
                     ? profileUrl[0].toUpperCase()
                     : userInfo.username
@@ -107,13 +101,12 @@ export function ProfileNavbar() {
         </div>
       </nav>
 
-      {/* Edit Dialog */}
       <ProfileEditDialog
         isOpen={isEditOpen}
         onClose={() => setIsEditOpen(false)}
         userId={userInfo.id}
         initialData={{
-          username: userInfo.username, // Pass username explicitly
+          username: userInfo.username,
           instagramUrl: userInfo.profileUrl || "",
         }}
       />

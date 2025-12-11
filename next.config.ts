@@ -1,26 +1,25 @@
-/** @type {import('next').NextConfig} */
 const nextConfig = {
   images: {
     remotePatterns: [
       {
         protocol: 'https',
-        hostname: '**.cdninstagram.com', // Covers all scontent-*.cdninstagram.com
+        hostname: '**.cdninstagram.com',
       },
       {
         protocol: 'https',
-        hostname: '**.fbcdn.net',        // Facebook/Instagram backup CDN
+        hostname: '**.fbcdn.net',
       },
       {
         protocol: 'https',
-        hostname: 'placehold.co',        // For your mock data
+        hostname: 'placehold.co',
       },
       {
         protocol: 'https',
-        hostname: 'utfs.io',        // For your mock data
+        hostname: 'utfs.io',
       },
       {
         protocol: 'https',
-        hostname: 'www.instagram.com',        // For your mock data
+        hostname: 'www.instagram.com',
       },
     ],
   },

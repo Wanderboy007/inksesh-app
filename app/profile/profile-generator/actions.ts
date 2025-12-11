@@ -20,8 +20,6 @@ export async function uploadAndSaveSelectedImages(
     throw new Error("Missing user ID or images");
   }
 
-  console.log(`🚀 Starting upload for ${images.length} images...`);
-
   try {
     const urls = images.map((img) => img.url);
     const uploadResults = await utapi.uploadFilesFromUrl(urls);
@@ -35,7 +33,6 @@ export async function uploadAndSaveSelectedImages(
         };
       }
       if (res.error) {
-        console.error(`❌ Image ${index} failed:`, res.error);
       }
       return null;
     }).filter((item) => item !== null);
@@ -66,8 +63,6 @@ export async function uploadAndSaveSelectedImages(
 
     const designIds = createdDesigns.map((d) => d.id).join(",");
 
-    console.log("🤖 Starting AI Analysis for:", designIds);
-
     try {
       const aiResponse = await fetch(
         `${process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000"}/api/ai/generatematadata`,
@@ -80,14 +75,11 @@ export async function uploadAndSaveSelectedImages(
 
       if (!aiResponse.ok) {
         const errorData = await aiResponse.json();
-        console.error("❌ AI Error:", errorData);
         throw new Error(errorData.error || "AI Analysis Failed");
       }
 
       const aiData = await aiResponse.json();
-      console.log("✅ AI Success:", aiData);
     } catch (aiError) {
-      console.error("⚠️ AI Analysis warning (designs still saved):", aiError);
     }
 
     return { 
@@ -96,7 +88,6 @@ export async function uploadAndSaveSelectedImages(
     };
 
   } catch (error) {
-    console.error("❌ Upload failed:", error);
     return { success: false, error: "Failed to upload images" };
   }
 } 

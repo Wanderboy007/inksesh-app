@@ -1,4 +1,3 @@
-// app/actions/user.ts
 "use server";
 
 import { prisma } from '@/lib/db/prisma';
@@ -26,7 +25,6 @@ export async function getUserById(userId: string) {
     return { success: true, user };
 
   } catch (error) {
-    console.error("Error fetching user:", error);
     return { success: false, message: "Internal server error" };
   }
 }

@@ -7,10 +7,7 @@ export default function ProfileLayout({
 }) {
   return (
     <div className="min-h-screen bg-neutral-950 text-white selection:bg-rose-600 selection:text-white">
-      {/* 1. The Sticky Navbar */}
       <ProfileNavbar />
-
-      {/* 2. Page Content */}
       <main className="relative">{children}</main>
     </div>
   );

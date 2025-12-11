@@ -51,14 +51,12 @@ export default function SignUpForm() {
   const profileUrlValue = watch("profileUrl");
   const emailValue = watch("email");
 
-  // Save email to localStorage
   useEffect(() => {
     if (emailValue) {
       localStorage.setItem("userEmail", emailValue);
     }
   }, [emailValue]);
 
-  // Extract username from Instagram URL
   useEffect(() => {
     if (!profileUrlValue) return;
 
@@ -83,7 +81,6 @@ export default function SignUpForm() {
         toast.success(result.message);
         reset();
 
-        // Redirect to /profile after success
         setTimeout(() => {
           router.push(
             `/profile/profile-generator?userId=${
@@ -105,7 +102,6 @@ export default function SignUpForm() {
 
   return (
     <div className="w-full max-w-md relative z-10">
-      {/* Header Section */}
       <div className="text-center mb-8 space-y-2">
         <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-neutral-100 dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 text-rose-600 dark:text-rose-400 text-sm font-medium mb-4 transition-colors">
           <Sparkles className="w-4 h-4" />
@@ -119,10 +115,8 @@ export default function SignUpForm() {
         </p>
       </div>
 
-      {/* Form Card */}
       <div className="bg-white dark:bg-neutral-900/50 border border-neutral-200 dark:border-neutral-800 backdrop-blur-sm rounded-2xl p-6 sm:p-8 shadow-xl dark:shadow-none transition-all duration-300">
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
-          {/* Email Field */}
           <div className="space-y-2">
             <label
               htmlFor="email"
@@ -149,7 +143,6 @@ export default function SignUpForm() {
             )}
           </div>
 
-          {/* Password Field */}
           <div className="space-y-2">
             <label
               htmlFor="password"
@@ -202,7 +195,6 @@ export default function SignUpForm() {
             )}
           </div>
 
-          {/* Username Field */}
           <div className="space-y-2">
             <label
               htmlFor="username"

@@ -87,18 +87,15 @@ export default function Step2SelectContent() {
     }));
 
     try {
-      // 1. Upload Images
       const result = await uploadAndSaveSelectedImages(userId, imagesPayload);
 
       if (!result.success) {
         throw new Error(result.error || "Upload failed");
       }
 
-      // --- PHASE 2: SUCCESS ---
       setIsUploading(false);
       setIsAnalyzing(true);
 
-      // Small delay to show success message
       await new Promise((resolve) => setTimeout(resolve, 1500));
 
       setIsAnalyzing(false);

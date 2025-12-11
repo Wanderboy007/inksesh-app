@@ -16,7 +16,6 @@ import {
 import { updateDesign } from "@/app/profile/actions";
 import { deleteDesign } from "@/app/profile/_edit-actions/delete-design-profile";
 
-// --- TYPES ---
 type Design = {
   id: string;
   imageUrl: string;
@@ -44,10 +43,8 @@ export function ProfileView({ user }: { user: UserProfile }) {
   const [isSaving, setIsSaving] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
 
-  // --- DYNAMIC HEADER IMAGE ---
   const headerImage = designs.length > 0 ? designs[0].imageUrl : null;
 
-  // --- FILTER LOGIC ---
   const uniqueTags = useMemo(() => {
     const tags = new Set<string>();
     designs.forEach((d) => {
@@ -64,7 +61,6 @@ export function ProfileView({ user }: { user: UserProfile }) {
     );
   }, [designs, activeFilter]);
 
-  // --- SAVE HANDLER ---
   const handleSave = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     if (!editingDesign) return;
@@ -72,7 +68,6 @@ export function ProfileView({ user }: { user: UserProfile }) {
 
     const formData = new FormData(e.currentTarget);
 
-    // Optimistic Update
     const updatedDesigns = designs.map((d) =>
       d.id === editingDesign.id
         ? {
@@ -95,14 +90,12 @@ export function ProfileView({ user }: { user: UserProfile }) {
     );
     setDesigns(updatedDesigns);
 
-    // Call Server
     await updateDesign(editingDesign.id, formData);
 
     setIsSaving(false);
     setEditingDesign(null);
   };
 
-  // --- DELETE HANDLER ---
   const handleDelete = async () => {
     if (!editingDesign) return;
 
@@ -128,7 +121,6 @@ export function ProfileView({ user }: { user: UserProfile }) {
 
   return (
     <div className="min-h-screen bg-neutral-950 text-white pb-20 relative">
-      {/* --- HERO HEADER --- */}
       <header className="relative w-full h-56 md:h-80 border-b border-white/5 overflow-hidden transition-all duration-500">
         {headerImage ? (
           <>
@@ -193,7 +185,6 @@ export function ProfileView({ user }: { user: UserProfile }) {
         </div>
       </header>
 
-      {/* --- FILTER BAR --- */}
       <div className="sticky top-0 z-30 bg-neutral-950/90 backdrop-blur-xl border-b border-white/5 py-2 md:py-4 px-4 md:px-6 transition-all">
         <div className="max-w-7xl mx-auto flex items-center justify-between gap-4">
           <div
@@ -232,7 +223,7 @@ export function ProfileView({ user }: { user: UserProfile }) {
           {activeFilter && (
             <button
               onClick={() => setActiveFilter(null)}
-              className="p-2 bg-neutral-800 rounded-full hover:bg-neutral-700 text-white flex-shrink-0 transition-colors mb-2" // mb-2 aligns it with buttons since scrollbar adds height
+              className="p-2 bg-neutral-800 rounded-full hover:bg-neutral-700 text-white shrink-0 transition-colors mb-2"
             >
               <X className="w-4 h-4" />
             </button>
@@ -240,7 +231,6 @@ export function ProfileView({ user }: { user: UserProfile }) {
         </div>
       </div>
 
-      {/* --- GRID --- */}
       <div className="max-w-7xl mx-auto px-2 md:px-6 mt-6 md:mt-8">
         <div className="mb-4 md:mb-6 px-2 text-xs md:text-sm text-neutral-500 font-medium">
           Showing {filteredDesigns.length}{" "}
@@ -326,14 +316,13 @@ export function ProfileView({ user }: { user: UserProfile }) {
         )}
       </div>
 
-      {/* --- EDIT MODAL --- */}
       {editingDesign && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm p-4 animate-in fade-in duration-200">
           <div
             className="bg-neutral-900 border border-neutral-800 w-full max-w-lg rounded-2xl p-6 md:p-8 shadow-2xl relative max-h-[90vh] overflow-y-auto
             [&::-webkit-scrollbar]:w-1.5
             [&::-webkit-scrollbar-track]:bg-transparent
-            [&::-webkit-scrollbar-track]:my-4  /* <--- ADDS SPACING AT TOP & BOTTOM */
+            [&::-webkit-scrollbar-track]:my-4
             [&::-webkit-scrollbar-thumb]:bg-neutral-800
             [&::-webkit-scrollbar-thumb]:rounded-full
             [&::-webkit-scrollbar-thumb]:hover:bg-neutral-700"
@@ -446,7 +435,6 @@ export function ProfileView({ user }: { user: UserProfile }) {
                 </div>
               </div>
 
-              {/* MODAL FOOTER */}
               <div className="flex flex-col-reverse sm:flex-row sm:justify-between items-center gap-4 mt-8 pt-6 border-t border-neutral-800">
                 <button
                   type="button"

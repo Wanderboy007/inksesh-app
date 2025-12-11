@@ -9,7 +9,6 @@ type Props = {
 
 const formatText = (text: string) => text.toLowerCase().replace(/_/g, " ");
 
-// --- DYNAMIC METADATA ---
 export async function generateMetadata(props: Props): Promise<Metadata> {
   const params = await props.params;
   const artist = await getArtistByUsername(params.username);
@@ -29,7 +28,6 @@ export async function generateMetadata(props: Props): Promise<Metadata> {
   };
 }
 
-// --- MAIN PAGE ---
 export default async function PublicArtistPage(props: Props) {
   const params = await props.params;
   const artist = await getArtistByUsername(params.username);
@@ -42,7 +40,6 @@ export default async function PublicArtistPage(props: Props) {
 
   return (
     <div className="min-h-screen bg-neutral-950 text-white">
-      {/* HEADER */}
       <header
         className="
           relative w-full 
@@ -70,7 +67,6 @@ export default async function PublicArtistPage(props: Props) {
         )}
       </header>
 
-      {/* CONTENT */}
       <div
         className="
           max-w-6xl mx-auto 
@@ -80,7 +76,6 @@ export default async function PublicArtistPage(props: Props) {
           relative
         "
       >
-        {/* PROFILE SECTION */}
         <section
           className="
             flex flex-col md:flex-row 
@@ -90,7 +85,6 @@ export default async function PublicArtistPage(props: Props) {
              border-neutral-800
           "
         >
-          {/* AVATAR */}
           <div
             className="
               relative rounded-full overflow-hidden 
@@ -112,7 +106,6 @@ export default async function PublicArtistPage(props: Props) {
             </span>
           </div>
 
-          {/* TEXT CONTENT */}
           <div className="text-center md:text-left flex-1">
             <h1 className="text-[clamp(1.8rem,4vw,3rem)] font-bold">
               {displayName}
@@ -136,7 +129,6 @@ export default async function PublicArtistPage(props: Props) {
             </div>
           </div>
 
-          {/* CTA BUTTON */}
           <button
             className="
               bg-white text-black 
@@ -151,7 +143,6 @@ export default async function PublicArtistPage(props: Props) {
           </button>
         </section>
 
-        {/* PORTFOLIO */}
         <section className="mt-12">
           <h2 className="text-[clamp(1.2rem,2vw,1.6rem)] font-semibold mb-6">
             Portfolio
@@ -184,7 +175,6 @@ export default async function PublicArtistPage(props: Props) {
                     className="object-cover transition duration-500 group-hover:scale-105"
                   />
 
-                  {/* OVERLAY - Always visible on mobile, hover on desktop */}
                   <div
                     className="
                       absolute inset-0 
@@ -208,7 +198,6 @@ export default async function PublicArtistPage(props: Props) {
                       {design.title}
                     </p>
 
-                    {/* TAGS */}
                     <div
                       className="
                         flex flex-wrap gap-1 sm:gap-1.5 

@@ -1,5 +1,5 @@
 import { prisma } from "@/lib/db/prisma";
-import { ProfileView } from "@/components/profile-view"; // Import the new component
+import { ProfileView } from "@/components/profile-view";
 
 export const dynamic = "force-dynamic";
 
@@ -10,7 +10,6 @@ export default async function ProfilePage({
 }) {
   const { userId } = await searchParams;
 
-  // Fetch all data
   const user = await prisma.user.findFirst({
     where: userId ? { id: userId } : undefined,
     orderBy: { createdAt: "desc" },
@@ -29,6 +28,5 @@ export default async function ProfilePage({
     );
   }
 
-  // Render the Client Component
   return <ProfileView user={user} />;
 }

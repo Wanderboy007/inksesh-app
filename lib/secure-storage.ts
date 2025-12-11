@@ -1,25 +1,17 @@
-// lib/secure-storage.ts
 import CryptoJS from "crypto-js";
 
 const SECRET_KEY = process.env.ENCRYPTION_KEY || "default-fallback-key";
 
 export const secureStorage = {
-  /**
-   * Encrypts a value and saves it to LocalStorage
-   */
   setItem: (key: string, value: string) => {
-    if (typeof window === "undefined") return; // Guard for server-side rendering
+    if (typeof window === "undefined") return;
     try {
       const encrypted = CryptoJS.AES.encrypt(value, SECRET_KEY).toString();
       localStorage.setItem(key, encrypted);
     } catch (e) {
-      console.error("Encryption error", e);
     }
   },
 
-  /**
-   * Retrieves and decrypts a value from LocalStorage
-   */
   getItem: (key: string) => {
     if (typeof window === "undefined") return null;
     try {
@@ -31,14 +23,10 @@ export const secureStorage = {
       
       return originalText || null;
     } catch (e) {
-      console.error("Decryption error", e);
       return null;
     }
   },
 
-  /**
-   * Removes item from LocalStorage
-   */
   removeItem: (key: string) => {
     if (typeof window === "undefined") return;
     localStorage.removeItem(key);
