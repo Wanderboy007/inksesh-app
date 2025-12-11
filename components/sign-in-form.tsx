@@ -37,7 +37,7 @@ export default function SignInForm() {
         secureStorage.setItem("c_uid", result.userId);
 
         toast.success("Welcome back!");
-        router.push(`/profile`);
+        router.push(`/profile?userId=${result.userId}`);
       } else {
         toast.error(result.message || "Invalid credentials");
       }
